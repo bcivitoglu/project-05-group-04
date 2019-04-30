@@ -27,13 +27,27 @@ plot(pressure)
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
+
+
+
+
+
 #Start the project
 
 ##Read in the data
+
 input_data <- readRDS(file ="CLL-Bcells_list.RDS.gz")
 
 annotation <- read.csv("sample_annotation.csv")
 
+##Divide the data in 3 subgroups
+
 genes <- input_data$genes
+
+promoters <- input_data$promoters
+
+cpgislands <- input_data$cpgislands
+
+
 
 
