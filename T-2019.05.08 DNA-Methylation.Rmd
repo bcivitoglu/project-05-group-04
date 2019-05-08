@@ -104,14 +104,20 @@ names(dfnew1) <- c("Chr", "CpG ´s")
 
 #Visualization
 
-# Histogram (for CpG derivation)
+## Histogram (for CpG derivation)
 
 hist(df, main = "Headline", xlab = "Name of x-axis", xlim = c(Starting_Number, Ending_Number), breaks = How_Many_Intervalls)
 
 hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpG´s in Region", xlim = c(0,600), breaks = 200)
 
-# Density plot (for CpG derivation)
+## Density plot (for CpG derivation)
 
 plot(df), xlab = "X-axis name", main = "",xlim = c(Starting_Number, Ending_Number))
 
 plot(density(genes$CpG), xlab = "Number of CpG´s", main = "",xlim = c(0,2000))
+
+## Boxplots (+modify)
+
+boxplot(df1,df2)
+
+boxplot(df1,df2, xlab = "Example_1", horizontal = T, ylim = c(0,1), ylab = "Non-cancer vs. CLL")
