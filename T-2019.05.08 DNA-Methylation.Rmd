@@ -15,6 +15,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r cars}
 summary(cars)
+dim(cars)
 ```
 
 ## Including Plots
@@ -73,7 +74,7 @@ E.g: colnames(genes)[colnames(genes)=="old_name"] <- "new_name"
 sum(is.na(df))
 --> Number of missing values is shown as result
 
-# Set NA´s to a defined number
+# Set NAï¿½s to a defined number
 
 df[is.na(df)] <- set_number
 E.g.: genes$Symbol[is.na(genes$Symbol)] <- 0
@@ -98,9 +99,9 @@ dfnew2 <- genes [, c(1:5)]
 dfnew1 <- data.frame(df$subpoint1, df$subpoint2)
 E.g.: dfnew1 <- data.frame(genes$Chromosome, genes$CpG)
 
-### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpG´s")
+### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpGï¿½s")
 
-names(dfnew1) <- c("Chr", "CpG ´s")
+names(dfnew1) <- c("Chr", "CpG ï¿½s")
 
 #Visualization
 
@@ -108,13 +109,13 @@ names(dfnew1) <- c("Chr", "CpG ´s")
 
 hist(df, main = "Headline", xlab = "Name of x-axis", xlim = c(Starting_Number, Ending_Number), breaks = How_Many_Intervalls)
 
-hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpG´s in Region", xlim = c(0,600), breaks = 200)
+hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpGï¿½s in Region", xlim = c(0,600), breaks = 200)
 
 ## Density plot (for CpG derivation)
 
 plot(df), xlab = "X-axis name", main = "",xlim = c(Starting_Number, Ending_Number))
 
-plot(density(genes$CpG), xlab = "Number of CpG´s", main = "",xlim = c(0,2000))
+plot(density(genes$CpG), xlab = "Number of CpGï¿½s", main = "",xlim = c(0,2000))
 
 ## Boxplots (+modify)
 
