@@ -73,7 +73,7 @@ E.g: colnames(genes)[colnames(genes)=="old_name"] <- "new_name"
 sum(is.na(df))
 --> Number of missing values is shown as result
 
-# Set NA´s to a defined number
+# Set NAÂ´s to a defined number
 
 df[is.na(df)] <- set_number
 E.g.: genes$Symbol[is.na(genes$Symbol)] <- 0
@@ -98,9 +98,9 @@ dfnew2 <- genes [, c(1:5)]
 dfnew1 <- data.frame(df$subpoint1, df$subpoint2)
 E.g.: dfnew1 <- data.frame(genes$Chromosome, genes$CpG)
 
-### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpG´s")
+### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpGÂ´s")
 
-names(dfnew1) <- c("Chr", "CpG ´s")
+names(dfnew1) <- c("Chr", "CpG Â´s")
 
 #Visualization
 
@@ -108,13 +108,13 @@ names(dfnew1) <- c("Chr", "CpG ´s")
 
 hist(df, main = "Headline", xlab = "Name of x-axis", xlim = c(Starting_Number, Ending_Number), breaks = How_Many_Intervalls)
 
-hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpG´s in Region", xlim = c(0,600), breaks = 200)
+hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpGÂ´s in Region", xlim = c(0,600), breaks = 200)
 
 ## Density plot (for CpG derivation)
 
 plot(df), xlab = "X-axis name", main = "",xlim = c(Starting_Number, Ending_Number))
 
-plot(density(genes$CpG), xlab = "Number of CpG´s", main = "",xlim = c(0,2000))
+plot(density(genes$CpG), xlab = "Number of CpGÂ´s", main = "",xlim = c(0,2000))
 
 ## Boxplots (+modify)
 
@@ -129,11 +129,11 @@ boxplot(df1,df2, xlab = "Example_1", horizontal = T, ylim = c(0,1), ylab = "Non-
 
 ## Beta Values
 
-###1 Set all Zero to NA´s (due to possible mistakes)
+###1 Set all Zero to NAÂ´s (due to possible mistakes)
 
 df[df == 0] <- NA
 
-###2 Go through each row and sum up the NA´s
+###2 Go through each row and sum up the NAÂ´s
 
 rmv.rows = apply(df,1, function(x){sum(is.na(x))})
 
@@ -145,7 +145,7 @@ which(rmv.rows > i)
 
 which (rmv.rows == i)
 
-###4 Remove your old Dataset with the NA´s with your new Dataset without the NA´s (Remove any row with more than i NA´s)
+###4 Remove your old Dataset with the NAÂ´s with your new Dataset without the NAÂ´s (Remove any row with more than i NAÂ´s)
 
 df = df[-which(rmv.rows > i),]
 
@@ -160,5 +160,5 @@ df[df$specialcolumn < quantile(df$specialcolumn, 0.90),]
 df_new = df[df$specialcolumn < quantile(df$specialcolumn, 0.90),]
 
 --> Frage: Wieso habe ich in df_new bei jeder Spalte nur die 95%
-  Quantile, obwohl ich ein df$specialcolumn ausgewählt habe ?
+  Quantile, obwohl ich ein df$specialcolumn ausgewÃ¤hlt habe ?
 
