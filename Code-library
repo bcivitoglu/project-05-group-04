@@ -189,4 +189,5 @@ range(coverage$cancer_VB_S00AYXU1.bed_coverage)
 range(coverage_cleaned$cancer_VB_S00AYXU1.bed_coverage)
 [1]      0 236806
 
-Example-note: Do not remove the quantiles in this way for more than one column 
+Example-note: Do not remove the quantiles in this way for more than one column
+How to push to master branch ?
