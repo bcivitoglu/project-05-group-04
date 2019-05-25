@@ -1,0 +1,200 @@
+﻿---
+title: "DNA Methylation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+ 
+
+
+
+#Start the project
+
+##Legend
+
+df = data frame
+
+## To make sure which file on my computer offers the environment for my R project:
+
+getwd()
+
+#Read in the data
+
+input_data <- readRDS(file ="CLL-Bcells_list.RDS.gz")
+
+annotation <- read.csv("sample_annotation.csv")
+
+##Divide the data in 3 subgroups
+
+genes <- input_data$genes
+
+promoters <- input_data$promoters
+
+cpgislands <- input_data$cpgislands
+
+# Rename a column
+
+## If you know the number of the columns
+
+names(df)[number_of_col] <- "new_name"
+E.g: names(genes)[1] <- "new_name"
+
+##If you have too many columns to know the number
+
+colnames(df)[colnames(df)=="old_name"] <- "new_name"
+E.g: colnames(genes)[colnames(genes)=="old_name"] <- "new_name"
+
+#Show if columns have missing values
+
+sum(is.na(df))
+--> Number of missing values is shown as result
+
+# Set NA´s to a defined number
+
+df[is.na(df)] <- set_number
+E.g.: genes$Symbol[is.na(genes$Symbol)] <- 0
+
+# Set 0 to NA
+
+df[df == 0] <- NA
+E.g.: genes$Symbol[genes$Symbol == 0] <- NA
+
+# Create new data frames with selected columns
+
+## Create a data frame with selected columns using indices
+
+dfnew1 <- genes[,c(1,2,3,4,5)]
+
+## Create a data frame with selected columns using indices (easier)
+
+dfnew2 <- genes [, c(1:5)]
+
+## Create a data frame using the names of the columns
+
+dfnew1 <- data.frame(df$subpoint1, df$subpoint2)
+E.g.: dfnew1 <- data.frame(genes$Chromosome, genes$CpG)
+
+### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpG´s")
+
+names(dfnew1) <- c("Chr", "CpG ´s")
+
+#Visualization
+
+## Histogram (for CpG derivation)
+
+hist(df, main = "Headline", xlab = "Name of x-axis", xlim = c(Starting_Number, Ending_Number), breaks = How_Many_Intervalls)
+
+hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpG´s in Region", xlim = c(0,600), breaks = 200)
+
+## Density plot (for CpG derivation)
+
+plot(df), xlab = "X-axis name", main = "",xlim = c(Starting_Number, Ending_Number))
+
+plot(density(genes$CpG), xlab = "Number of CpG´s", main = "",xlim = c(0,2000))
+
+## Boxplots (+modify)
+
+boxplot(df1,df2)
+
+boxplot(df1,df2, xlab = "Example_1", horizontal = T, ylim = c(0,1), ylab = "Non-cancer vs. CLL")
+
+
+
+
+#Clean up our data
+
+## Beta Values
+
+###1 Set all Zero to NA´s (due to possible mistakes)
+
+df[df == 0] <- NA
+
+###2 Go through each row and sum up the NA´s
+
+rmv.rows = apply(df,1, function(x){sum(is.na(x))})
+
+###3 Number of NA`s greater i
+
+which(rmv.rows > i)
+
+### Or even i
+
+which (rmv.rows == i)
+
+###4 Remove your old Dataset with the NA´s with your new Dataset without the NA´s (Remove any row with more than i NA´s)
+
+df = df[-which(rmv.rows > i),]
+
+## Coverage Values
+
+###1 Show me all the Values within the 90% quantile
+
+df[df$specialcolumn < quantile(df$specialcolumn, 0.90),]
+
+###2 Create new dataset with just the values inside 90% quantile
+
+df_new = df[df$specialcolumn < quantile(df$specialcolumn, 0.90),]
+
+
+
+# Trying to remove special coverage values (Question at the end)
+
+##1 Create new dataframe only with coverage values (genes)
+
+coverage <- genes[,c(21:30)]
+
+##2 Only keep values within the 90% quantile
+
+coverage_cleaned = coverage[coverage$Bcell_mem_VB_C003JB51.bed_coverage < quantile(coverage$Bcell_mem_VB_C003JB51.bed_coverage, 0.90),]
+
+##3 Compare range of columns
+
+###Column of first healthy patient
+
+range(coverage$Bcell_mem_VB_C003JB51.bed_coverage)
+[1]       0 1552321
+
+range(coverage_cleaned$Bcell_mem_VB_C003JB51.bed_coverage)
+[1]     0 38338
+
+###Column of first cancer patient
+
+range(coverage$cancer_VB_S00AYXU1.bed_coverage)
+[1]      0 652507
+
+range(coverage_cleaned$cancer_VB_S00AYXU1.bed_coverage)
+[1]      0 236806
+
+Example-note: Do not remove the quantiles in this way for more than one column
+
+How to push to master branch ?
+
+Lotta Violetta Leona
+
+
+
+
