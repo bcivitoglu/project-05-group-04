@@ -51,3 +51,18 @@ cov_genes_means <- rowMeans(data.matrix(cov_genes))
 # logarithmic density plot of coverage values
 plot(density(cov_genes_means), xlab = "coverage means", main = "coverage distribution", log = "x"
 ))
+
+#divide the beta values into a dataframe of healthy and cancer cells
+
+beta_genes_healthy <- genes[,c(11:15)]
+beta_genes_cancer <- genes[,c(16:20)]
+
+#count the NAs in the 2 dataframes per row
+
+rmv.rows_healthy = apply(beta_genes_healthy,1, function(x){sum(is.na(x))})
+rmv.rows_cancer = apply(beta_genes_cancer,1, function(x){sum(is.na(x))})
+
+# new beta value data frame where all rows with more than 2 NAs are removed
+
+beta_genes_healthy_cleaned = beta_genes_healthy[-which(rmv.rows_healthy > 2),]
+beta_genes_cancer_cleaned = beta_genes_cancer[-which(rmv.rows_cancer > 2),]
