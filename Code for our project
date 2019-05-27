@@ -48,9 +48,41 @@ cov_genes <- genes[ ,c(21:30)]
 
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
 
-# logarithmic density plot of coverage values
-plot(density(cov_genes_means), xlab = "coverage means", main = "coverage distribution", log = "x"
-))
+#logarithmic density plot of coverage values
+plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
+
+#finding the upper threshold for deleting coverage values by quantiles we read about in literature
+#we draw the lines of the quantiles in a logarithmic plot
+
+quantile(cov_genes_means, probs = c(.95))
+abline(v=log10(52529.75))
+
+quantile(cov_genes_means, probs = c(.975))
+abline(v=log10(82556.55))
+
+quantile(cov_genes_means, probs = c(.999))
+abline(v=log10(311230.4))
+
+#we set the lower threshold to the coverage value 10 
+abline(v=log10(10))
+
+#sollen wir das gesamte Gen löschen, wenn die coverage bei 3 oder mehr gesunden bzw. kranken Patienten außerhalb des thresholds liegt?
+#macht es Sinn, kranke und gesunde bei den coverage means zu trennen? Hat es Auswirkungen?
+
+#separate sick and healthy patient coverage for deleting genes with 3 or more coverage values outside the threshold later
+cov_genes_healthy <- genes[ ,c(21:25)]
+cov_genes_cancer <- genes[ ,c(26:30)]
+
+#test mean coverage values of only healthy and only sick patients 
+
+cov_genes_means_healthy <- rowMeans(data.matrix(cov_genes_healthy))
+plot(density(log10(cov_genes_means_healthy)), xlab = "coverage means", main = "coverage distribution")
+
+cov_genes_means_cancer <- rowMeans(data.matrix(cov_genes_cancer))
+plot(density(log10(cov_genes_means_cancer)), xlab = "coverage means", main = "coverage distribution")
+
+#wie kann das sein wenn wir die 0 Werte schon gelöscht haben, dass wir dann noch Werte unter 0 haben???
+
 
 #divide the beta values into a dataframe of healthy and cancer cells
 
