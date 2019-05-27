@@ -48,7 +48,7 @@
   sum(is.na(df))
   --> Number of missing values is shown as result
 
-## Set NA�s to a defined number
+## Set NA´s to a defined number
 
   df[is.na(df)] <- set_number
   E.g.: genes$Symbol[is.na(genes$Symbol)] <- 0
@@ -75,9 +75,9 @@
   dfnew1 <- data.frame(df$subpoint1, df$subpoint2)
   E.g.: dfnew1 <- data.frame(genes$Chromosome, genes$CpG)
 
-### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpG´s")
+### Rename all the (old) columns at once ("Chromosome" --> "Chr" ; "CpG" --> "CpGÂ´s")
 
-  names(dfnew1) <- c("Chr", "CpG ´s")
+  names(dfnew1) <- c("Chr", "CpG Â´s")
 
 
 
@@ -87,13 +87,13 @@
 
   hist(df, main = "Headline", xlab = "Name of x-axis", xlim = c(Starting_Number, Ending_Number), breaks = How_Many_Intervalls)
 
-  hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpG´s in Region", xlim = c(0,600), breaks = 200)
+  hist(cpgislands$CpG, main = "Histogram for CpG derivation", xlab = "Number of CpGÂ´s in Region", xlim = c(0,600), breaks = 200)
 
 ## Density plot
 
   plot(df), xlab = "X-axis name", main = "",xlim = c(Starting_Number, Ending_Number))
 
-  plot(density(genes$CpG), xlab = "Number of CpG´s", main = "",xlim = c(0,2000))
+  plot(density(genes$CpG), xlab = "Number of CpGÂ´s", main = "",xlim = c(0,2000))
 
 ## Boxplots
 
@@ -108,11 +108,11 @@
 
 ## Beta Values
 
-###1 Set all Zero to NA´s (due to possible mistakes)
+###1 Set all Zero to NAÂ´s (due to possible mistakes)
 
   df[df == 0] <- NA
 
-###2 Go through each row and sum up the NA´s
+###2 Go through each row and sum up the NAÂ´s
 
   rmv.rows = apply(df,1, function(x){sum(is.na(x))})
 
@@ -124,7 +124,7 @@
 
   which (rmv.rows == i)
 
-###4 Remove your old Dataset with the NA´s with your new Dataset without the NA´s (Remove any row with more than i NA´s)
+###4 Remove your old Dataset with the NAÂ´s with your new Dataset without the NAÂ´s (Remove any row with more than i NAÂ´s)
 
   df = df[-which(rmv.rows > i),]
 
@@ -146,9 +146,9 @@
   quantile(df, c(0.80, .90, .95))
   
 
-#Prepare for a nestled for loop
+#Prepare for a nested for loop
 
-##Check for NA�s in our dataset we want to clean
+##Check for NA´s in our dataset we want to clean
 
 sum(is.na(cov_gene_healthy))
 
@@ -168,7 +168,7 @@ threshhold1 <- quantile(cov_genes_means, probs = seq(0.011,0.011,0.05), na.rm = 
 
 threshhold2 <- quantile (cov_genes_means, probs = seq(0.95,0.95,0.05), na.rm = TRUE)
 
-##The actual nestled for loop
+##The actual nested for loop --> Doenst work 
 
 for (i in 1:m) {
   for (j in 1:n) {
