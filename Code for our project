@@ -49,5 +49,55 @@ cov_genes <- genes[ ,c(21:30)]
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
 
 # logarithmic density plot of coverage values
-plot(density(cov_genes_means), xlab = "coverage means", main = "coverage distribution", log = "x"
-))
+plot(density(cov_genes_means), xlab = "coverage means", main = "coverage distribution", log = "x"))
+
+
+# Normal density plot of coverage values
+
+cov_genes_healthy <- genes[,c(21:25)]
+
+plot(density(cov_genes_means), xlab = "Coverage values", main = "",xlim = c(0,80000))
+
+## 95% percentile
+abline(v = quantile(cov_genes_means, probs = seq(0.95,0.95,0.05), ra.rm = T))
+
+## Compare the percentile with the actual value 
+
+quantile (cov_genes_means, c(0.1,0.9))
+
+
+
+#Prepare for a nestled for loop
+
+##Check for NA´s in our dataset we want to clean
+
+sum(is.na(cov_gene_healthy))
+
+--> if the answer is anything above 0, remove the NA or set it to a value which we want to remove anyway
+
+cov_genes_healthy[is.na(cov_genes_healthy)] <- 0
+
+##Define the length and the number of rows from our dataset to use this code universally
+
+n = length(cov_genes_healthy)
+
+m = nrow(cov_genes_healthy)
+
+##Define the two threshholds from our mean data set 
+
+threshhold1 <- quantile(cov_genes_means, probs = seq(0.011,0.011,0.05), na.rm = TRUE)
+
+threshhold2 <- quantile (cov_genes_means, probs = seq(0.95,0.95,0.05), na.rm = TRUE)
+
+##The actual nestled for loop
+
+for (i in 1:m) {
+  for (j in 1:n) {
+    if (cov_genes_healthy[i, j] < threshhold1){
+      cov_genes_healthy[i, j] <- NA  
+    }
+        if (cov_genes_healthy[i, j] > threshhold2){
+          cov_genes_healthy[i, j] <- NA
+        }
+  }
+}
