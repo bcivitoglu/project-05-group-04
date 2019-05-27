@@ -67,37 +67,3 @@ quantile (cov_genes_means, c(0.1,0.9))
 
 
 
-#Prepare for a nestled for loop
-
-##Check for NA´s in our dataset we want to clean
-
-sum(is.na(cov_gene_healthy))
-
---> if the answer is anything above 0, remove the NA or set it to a value which we want to remove anyway
-
-cov_genes_healthy[is.na(cov_genes_healthy)] <- 0
-
-##Define the length and the number of rows from our dataset to use this code universally
-
-n = length(cov_genes_healthy)
-
-m = nrow(cov_genes_healthy)
-
-##Define the two threshholds from our mean data set 
-
-threshhold1 <- quantile(cov_genes_means, probs = seq(0.011,0.011,0.05), na.rm = TRUE)
-
-threshhold2 <- quantile (cov_genes_means, probs = seq(0.95,0.95,0.05), na.rm = TRUE)
-
-##The actual nestled for loop
-
-for (i in 1:m) {
-  for (j in 1:n) {
-    if (cov_genes_healthy[i, j] < threshhold1){
-      cov_genes_healthy[i, j] <- NA  
-    }
-        if (cov_genes_healthy[i, j] > threshhold2){
-          cov_genes_healthy[i, j] <- NA
-        }
-  }
-}
