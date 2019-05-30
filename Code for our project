@@ -119,4 +119,9 @@ rmv.rows_cancer = apply(beta_genes_cancer,1, function(x){sum(is.na(x))})
 
 beta_genes_healthy_cleaned = beta_genes_healthy[-which(rmv.rows_healthy > 2),]
 beta_genes_cancer_cleaned = beta_genes_cancer[-which(rmv.rows_cancer > 2),]
->>>>>>> 0a48c625b60618ef706c2453dd0357ab3f0af0ab
+
+#Normalisation: Transform beta-values into M-values
+
+M_genes_h <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
+M_genes_c <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
+
