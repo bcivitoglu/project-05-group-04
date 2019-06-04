@@ -182,3 +182,10 @@ for (i in 1:ncol(cov_genes_healthy)) {
     }
   }
 }
+
+
+#Normalisation: Transform beta-values into M-values
+
+M_genes_h <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
+M_genes_c <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
+
