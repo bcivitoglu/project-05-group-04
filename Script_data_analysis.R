@@ -139,7 +139,7 @@ df[df$specialcolumn < quantile(df$specialcolumn, 0.90),]
 
 df_new = df[df$specialcolumn < quantile(df$specialcolumn, 0.90),]
 
---> Care: You remove the the rows, which only belong to ONE column (df$specialcomun)
+# --> Care: You remove the the rows, which only belong to ONE column (df$specialcomun)
 
 ##3 If you want to know a percentile to compare(In this case the 80%, 90%, 95% "percentile")
 
@@ -154,7 +154,7 @@ quantile(df, c(0.80, .90, .95))
 
 sum(is.na(cov_genes_healthy))
 
---> if the answer is anything above 0, remove the NA or set it to a value which we want to remove anyway
+# --> if the answer is anything above 0, remove the NA or set it to a value which we want to remove anyway
 
 cov_genes_healthy[is.na(cov_genes_healthy)] <- 0
 
