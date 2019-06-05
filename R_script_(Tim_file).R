@@ -39,3 +39,31 @@ for(i in 1:ncol(cov_genes)){
     }
   }
 }
+
+##Dataframe for beta values(+Chromosomes)
+
+beta_genes <- genes[,c(11:20)]
+
+##Nested for loop to bring Coverage NA큦 to beta NA큦
+
+for(k in 1:ncol(beta_genes)){
+  for(l in 1:nrow(beta_genes)){
+    if(isTRUE(is.na(cov_genes[k,l] == TRUE))){
+      beta_genes[k,l] <- NA
+    } 
+  }
+}
+
+##Count NA큦 in dataframe
+
+rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
+
+##New dataframe out of beta_genes, where all rows with more than 2 NA큦 are removed
+
+beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
+
+
+##Make a dataframe with cleaned beta values and the associated chromosome
+
+
+
