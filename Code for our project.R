@@ -68,9 +68,6 @@ abline(v=log10(311230.4))
 abline(v=log10(10))
 
 
-
-#wie kann das sein wenn wir die 0 Werte schon gelöscht haben, dass wir dann noch Werte unter 0 haben???
-
 #Nested for loop
 
 ##Mean of every gene (check for NA´s first and set them to zero if NA´s available)
