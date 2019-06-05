@@ -70,7 +70,7 @@ abline(v=log10(10))
 
 #Nested for loop
 
-##Mean of every gene (check for NA´s first and set them to zero if NA´s available)
+##Mean of every gene (check for NAÂ´s first and set them to zero if NAÂ´s available)
 
 sum(is.na(cov_genes))
 
