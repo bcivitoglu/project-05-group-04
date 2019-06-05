@@ -48,35 +48,9 @@ cov_genes <- genes[ ,c(21:30)]
 
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
 
-<<<<<<< HEAD
 
 #logarithmic density plot of coverage values
 plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
-=======
-<<<<<<< HEAD
-# logarithmic density plot of coverage values
-plot(density(cov_genes_means), xlab = "coverage means", main = "coverage distribution", log = "x"))
-
-
-# Normal density plot of coverage values
-
-cov_genes_healthy <- genes[,c(21:25)]
-
-plot(density(cov_genes_means), xlab = "Coverage values", main = "",xlim = c(0,80000))
-
-## 95% percentile
-abline(v = quantile(cov_genes_means, probs = seq(0.95,0.95,0.05), ra.rm = T))
-
-## Compare the percentile with the actual value 
-
-quantile (cov_genes_means, c(0.1,0.9))
-
-
-
-=======
-  #logarithmic density plot of coverage values
-  plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
->>>>>>> e1bc48ec9dd1b1699f2fea3edcf36268bdcfe0fa
 
 #finding the upper threshold for deleting coverage values by quantiles we read about in literature
 #we draw the lines of the quantiles in a logarithmic plot
@@ -93,30 +67,13 @@ abline(v=log10(311230.4))
 #we set the lower threshold to the coverage value 10 
 abline(v=log10(10))
 
-<<<<<<< HEAD
 
-=======
-#sollen wir das gesamte Gen lÃ¶schen, wenn die coverage bei 3 oder mehr gesunden bzw. kranken Patienten auÃŸerhalb des thresholds liegt?
-#macht es Sinn, kranke und gesunde bei den coverage means zu trennen? Hat es Auswirkungen?
 
-#separate sick and healthy patient coverage for deleting genes with 3 or more coverage values outside the threshold later
-cov_genes_healthy <- genes[ ,c(21:25)]
-cov_genes_cancer <- genes[ ,c(26:30)]
-
-#test mean coverage values of only healthy and only sick patients 
-
-cov_genes_means_healthy <- rowMeans(data.matrix(cov_genes_healthy))
-plot(density(log10(cov_genes_means_healthy)), xlab = "coverage means", main = "coverage distribution")
-
-cov_genes_means_cancer <- rowMeans(data.matrix(cov_genes_cancer))
-plot(density(log10(cov_genes_means_cancer)), xlab = "coverage means", main = "coverage distribution")
->>>>>>> e1bc48ec9dd1b1699f2fea3edcf36268bdcfe0fa
-
-#wie kann das sein wenn wir die 0 Werte schon gelÃ¶scht haben, dass wir dann noch Werte unter 0 haben???
+#wie kann das sein wenn wir die 0 Werte schon gelöscht haben, dass wir dann noch Werte unter 0 haben???
 
 #Nested for loop
 
-##Mean of every gene (check for NAÂ´s first and set them to zero if NAÂ´s available)
+##Mean of every gene (check for NA´s first and set them to zero if NA´s available)
 
 sum(is.na(cov_genes))
 
@@ -128,11 +85,7 @@ cov_genes_mean <- rowMeans(data.matrix(cov_genes))
 
 threshhold1 <- 10
 
-<<<<<<< HEAD
 threshhold2 <- quantile(cov_genes_mean, probs = seq(0.90,0.90,0.05))
-=======
-threshhold2 <- quantile(cov_genes_mean, probs = seq(0.95,0.95,0.05))
->>>>>>> e1bc48ec9dd1b1699f2fea3edcf36268bdcfe0fa
 
 
 ##Nested for loop 
@@ -148,7 +101,6 @@ for(i in 1:ncol(cov_genes)){
   }
 }
 
-<<<<<<< HEAD
 #separate sick and healthy patient coverage for deleting genes with 3 or more coverage values outside the threshold later
 cov_genes_healthy <- cov_genes[ ,c(1:5)]
 cov_genes_cancer <- cov_genes[ ,c(6:10)]
@@ -163,19 +115,14 @@ rmv.rows_cancer_cov = apply(cov_genes_cancer,1, function(x){sum(is.na(x))})
 cov_genes_cancer_cleaned = cov_genes_cancer[-which(rmv.rows_cancer_cov > 2),]
 cov_genes_healthy_cleaned = cov_genes_healthy[-which(rmv.rows_healthy_cov > 2),]
 
-=======
->>>>>>> e1bc48ec9dd1b1699f2fea3edcf36268bdcfe0fa
 #divide the beta values into a dataframe of healthy and cancer cells
 
 beta_genes_healthy <- genes[,c(11:15)]
 beta_genes_cancer <- genes[,c(16:20)]
 
-<<<<<<< HEAD
 beta_genes_healthy = beta_genes_healthy[-which(rmv.rows_healthy_cov > 2),]
 beta_genes_cancer = beta_genes_cancer[-which(rmv.rows_cancer_cov > 2),]
 
-=======
->>>>>>> e1bc48ec9dd1b1699f2fea3edcf36268bdcfe0fa
 #count the NAs in the 2 dataframes per row in a new data frame
 
 rmv.rows_healthy = apply(beta_genes_healthy,1, function(x){sum(is.na(x))})
@@ -186,7 +133,6 @@ rmv.rows_cancer = apply(beta_genes_cancer,1, function(x){sum(is.na(x))})
 beta_genes_healthy_cleaned = beta_genes_healthy[-which(rmv.rows_healthy > 2),]
 beta_genes_cancer_cleaned = beta_genes_cancer[-which(rmv.rows_cancer > 2),]
 
-<<<<<<< HEAD
 Row_Difference = nrow(beta_genes_cancer)-nrow(beta_genes_cancer_cleaned)
 View(Row_Difference)
 genes_deleted_cancer_percentage = Row_Difference/nrow(beta_genes_cancer)*100
@@ -197,11 +143,7 @@ View(Row_Difference_2)
 genes_deleted_healthy_percentage = Row_Difference_2/nrow(beta_genes_healthy)*100
 sum(genes_deleted_healthy_percentage)
 
-=======
->>>>>>> e1bc48ec9dd1b1699f2fea3edcf36268bdcfe0fa
 #Normalisation: Transform beta-values into M-values
 
 M_genes_h <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
 M_genes_c <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
-
-
