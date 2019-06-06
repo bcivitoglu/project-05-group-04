@@ -140,6 +140,14 @@ View(Row_Difference_2)
 genes_deleted_healthy_percentage = Row_Difference_2/nrow(beta_genes_healthy)*100
 sum(genes_deleted_healthy_percentage)
 
+
+#replace beta values for 0 and 1
+beta_genes_healthy_cleaned[beta_genes_healthy_cleaned==0]<-0.00000001
+beta_genes_healthy_cleaned[beta_genes_healthy_cleaned==1]<-0.99999999
+
+beta_genes_cancer_cleaned[beta_genes_cancer_cleaned==0]<-0.00000001
+beta_genes_cancer_cleaned[beta_genes_cancer_cleaned==1]<-0.99999999
+
 #Normalisation: Transform beta-values into M-values
 
 M_genes_h <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
