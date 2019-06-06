@@ -10,7 +10,13 @@ genes <- input_data$genes
 
 ##Make a dataset with coverage values only
 
-cov_genes <- genes[,c(21:30)]
+cov_genes <- genes[,c(1,21:30)]
+
+##Remove ChrX and ChrY
+
+cov_genes_new <- cov_genes[-which(cov_genes =="chrX"),]
+cov_genes <- cov_genes_new[-which(cov_genes_new =="chrY"),]
+rm(cov_genes_new)
 
 ##Mean of every gene (check for NAÂ´s first and set them to zero if NAÂ´s available)
 
@@ -42,7 +48,14 @@ for(i in 1:ncol(cov_genes)){
 
 ##Dataframe for beta values(+Chromosomes)
 
-beta_genes <- genes[,c(11:20)]
+beta_genes <- genes[,c(1,11:20)]
+
+##Also remove chrX and chrY
+
+beta_genes_new <- beta_genes[-which(beta_genes =="chrX"),]
+beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
+rm(beta_genes_new)
+
 
 ##Nested for loop to bring Coverage NA´s to beta NA´s
 
