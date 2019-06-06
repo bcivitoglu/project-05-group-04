@@ -45,6 +45,7 @@ for(i in 1:ncol(cov_genes)){
     }
   }
 }
+rm(i,j,threshhold1,threshhold2)
 
 ##Dataframe for beta values(+Chromosomes)
 
@@ -66,6 +67,7 @@ for(k in 1:ncol(beta_genes)){
     } 
   }
 }
+rm(k,l)
 
 ##Count NA´s in dataframe
 
