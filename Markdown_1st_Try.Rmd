@@ -1,0 +1,126 @@
+---
+title: "Cancer methylome analysis CLL vs. B-Cells"
+author: "Leona Brandl, Carlotta Brüggen, Tim Kühn, Violetta Schaaf"
+date: "8th July 2019"
+output: html_document
+---
+
+
+Text about what our project is about.
+
+The analysis will be done in several steps:
+
+
+1. **Data processing**
+  * Reorganisation of the data
+  * Quality control 
+  concerning NAs, coverage values and unusefull DNA-regions
+2. **Normalisation**
+  * Transformation of beta-values into M-values
+  * Quality control of M-values
+3. **Data reduction**
+  * Dimensionality reduction via PCA
+  * Featuere selection
+4. **Clustering**
+ 
+ Via K-means clustering
+   
+5. **Identifying DMRs**
+6. **logistic regression**
+7. **Data interpretation**
+
+
+### Data processing
+
+Before we can start analysing our data set it has to be tidied up to make it easy for us to work with it by making it as clear as possible. Datasets have to be split up and reorganized, coloums removed or renamed and a quality control performed.
+
+#### Reading in the datasets
+
+We start by **reading in our CLL-Bcell-data and the annotations** which is an extra document explaining where our data is coming from.
+
+```{r}
+input_data <- readRDS(file ="CLL-Bcells_list.RDS.gz")
+
+annotation <- read.csv("sample_annotation.csv")
+```
+
+#### Reorganisation of the data
+
+Our main dataset, the one containing the data we are working with, is `input_data`. It contains methylation data in form of beta values and coverage values of B-cells of five healthy patients and five patients suffering from CLL. It is divided into four subgroups: tiling, genes, promoters and CpG islands. We have to analyse those subgroups separatly, because methylation in promoters, genes and CpG islands can have different biological reasons and also this way the data the computer deals with is not that much while running the algorithm. Therefor **the dataset gets divided into four subdatasets**.
+
+```{r}
+genes <- input_data$genes
+
+promoters <- input_data$promoters
+
+cpgislands <- input_data$cpgislands
+
+tiling <- input_data$tiling
+```
+
+Those subgroups datasets contain methylation data for different regions on the genome:
+`genes`, `promoters` and `cpgislands`contain genome segments with specific functions and methylation features. Genes, especially highly expressed genes, sometimes show methylation in their gene body. Unfortunately the biological function behind this is not fuly clear yet. Still it can be interesting investigating in their methylation pattern in terms of cancer. In promoters  we already know that methylation plays an important role, because as promoters are the starting point for transcription, their methylation can silence genes laying downstream of these promoters. This way for example tumor suppresor genes don't get expressed any more, which can lead to cancer. Here we expect to find crucial differences in methylation between sick and healthy cells. CpG islands also are important regions on the DNA with a high density of cytosines in neighbourhood to guanines. These CpG islands are often in promoter regions of housekeeping genes and in healthy beeings only rarely methylated, because their methylation usually leads to mistakes in replication and transcription and quickly in death just because functioning promoters are so essential in those genes. Also in those CpG islands a loss of function can lead to cancer, so we expect significant methylation differences. The fourth subgroup is `tiling` which describes a specific section on the genome in steps of 5000 nucleotides without a biological context.
+
+As we want to analyse those subgroups separatly, we first just chose one subgroup, genes, 
+to work on our code. Later we can trnsfer the code on the other subgroups, too.
+In this `genes`dataset we **rename the columns**, which stand for different patients (patient 1 to patient 10). They get short precise names to get the meaning on the first sight.
+
+```{r}
+names(genes)[11] <- "P1_healthy_beta"
+names(genes)[12] <- "P2_healthy_beta"
+names(genes)[13] <- "P3_healthy_beta"
+names(genes)[14] <- "P4_healthy_beta"
+names(genes)[15] <- "P5_healthy_beta"
+names(genes)[16] <- "P6_CLL_beta"
+names(genes)[17] <- "P7_CLL_beta"
+names(genes)[18] <- "P8_CLL_beta"
+names(genes)[19] <- "P9_CLL_beta"
+names(genes)[20] <- "P10_CLL_beta"
+names(genes)[21] <- "P1_healthy_coverage"
+names(genes)[22] <- "P2_healthy_coverage"
+names(genes)[23] <- "P3_healthy_coverage"
+names(genes)[24] <- "P4_healthy_coverage"
+names(genes)[25] <- "P5_healthy_coverage"
+names(genes)[26] <- "P6_CLL_coverage"
+names(genes)[27] <- "P7_CLL_coverage"
+names(genes)[28] <- "P8_CLL_coverage"
+names(genes)[29] <- "P9_CLL_coverage"
+names(genes)[30] <- "P10_CLL_coverage"
+```
+
+####quality control
+
+It is important to remove values that are not needed for or even hinder further analysis. Among other values those are also coverage values, which seem to be unrealistically high due to PCR dublicates or repetetive regions, or are that low, so the belonging beta-value of the DNA section has no meaning, because there was no fitting allignment when mapping back PCR fragments onto the genome. 
+A **data frame only containing coverage values** is created.
+
+```{r}
+cov_genes <- genes[ ,c(21:30)]
+```
+
+There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value contribution among all patients using a logarthmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated and a **logarithmic density plot** using this matrix is generated.
+
+```{r}
+cov_genes_means <- rowMeans(data.matrix(cov_genes))
+plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
+```
+
+To **find an upper threshold** for deleting coverage values we try quantile values we read about in literature and draw the lines for those quantiles in the logarithmic plot to see wether one of those coincidences with a kink in the curve. For the **lower threshold** we draw lines at the values 10 and 15, which are common threshold values as we read in litearture.
+
+```{r}
+quantile(cov_genes_means, probs = c(.95))
+abline(v=log10(52529.75))
+
+quantile(cov_genes_means, probs = c(.975))
+abline(v=log10(82556.55))
+
+quantile(cov_genes_means, probs = c(.999))
+abline(v=log10(311230.4))
+
+abline(v=log10(10))
+
+```
+
+Both lower thresholds and the highest upper threshold seem to be fitting looking at the diagram. But which threshold we will chose eventually also depends on the percentage of deleted rows aat the end of quality control.
+
+
+
