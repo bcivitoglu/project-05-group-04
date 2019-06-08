@@ -44,6 +44,13 @@ names(genes)[30] <- "P10_CLL_coverage"
 
 cov_genes <- genes[ ,c(21:30)]
 
+##Remove ChrX and ChrY
+
+cov_genes_new <- cov_genes[-which(cov_genes =="chrX"),]
+cov_genes <- cov_genes_new[-which(cov_genes_new =="chrY"),]
+rm(cov_genes_new)
+
+
 #Calculate coverage means for each gene
 
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
@@ -78,77 +85,91 @@ cov_genes[is.na(cov_genes)] <- 0
 
 cov_genes_mean <- rowMeans(data.matrix(cov_genes))
 
-##Set threshhold
+##Set threshold
 
-threshhold1 <- 10
+threshold1 <- 15
 
-threshhold2 <- quantile(cov_genes_mean, probs = seq(0.90,0.90,0.05))
+threshold2 <- quantile(cov_genes_mean, probs = seq(0.90,0.90,0.05))
 
 
 ##Nested for loop 
 
-for(i in 1:ncol(cov_genes)){
-  for(j in 1:nrow(cov_genes)){
-    if(isTRUE(cov_genes[i,j] <= threshhold1)){
+for(i in 1:nrow(cov_genes)){
+  for(j in 1:ncol(cov_genes)){
+    if(isTRUE(cov_genes[i,j] <= threshold1)){
       cov_genes[i,j] <- NA
     } 
-    if(isTRUE(cov_genes[i,j] >= threshhold2)){
+    if(isTRUE(cov_genes[i,j] >= threshold2)){
       cov_genes[i,j] <- NA
     }
   }
 }
 
-#separate sick and healthy patient coverage for deleting genes with 3 or more coverage values outside the threshold later
-cov_genes_healthy <- cov_genes[ ,c(1:5)]
-cov_genes_cancer <- cov_genes[ ,c(6:10)]
+rm(i,j,threshold1,threshold2)
 
-#count the NAs in the 2 dataframes per row in a new data frame
+##Dataframe for beta values(+Chromosomes)
 
-rmv.rows_healthy_cov = apply(cov_genes_healthy,1, function(x){sum(is.na(x))})
-rmv.rows_cancer_cov = apply(cov_genes_cancer,1, function(x){sum(is.na(x))})
+beta_genes <- genes[,c(1,11:20)]
 
-# new coverage data frame where all rows with more than 2 NAs are removed
+##Also remove chrX and chrY
 
-cov_genes_cancer_cleaned = cov_genes_cancer[-which(rmv.rows_cancer_cov > 2),]
-cov_genes_healthy_cleaned = cov_genes_healthy[-which(rmv.rows_healthy_cov > 2),]
+beta_genes_new <- beta_genes[-which(beta_genes =="chrX"),]
+beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
+rm(beta_genes_new)
 
-#divide the beta values into a dataframe of healthy and cancer cells
 
-beta_genes_healthy <- genes[,c(11:15)]
-beta_genes_cancer <- genes[,c(16:20)]
+##Nested for loop to bring Coverage NA´s to beta NA´s
 
-beta_genes_healthy = beta_genes_healthy[-which(rmv.rows_healthy_cov > 2),]
-beta_genes_cancer = beta_genes_cancer[-which(rmv.rows_cancer_cov > 2),]
+for(k in 1:ncol(beta_genes)){
+  for(l in 1:nrow(beta_genes)){
+    if(isTRUE(is.na(cov_genes[k,l] == TRUE))){
+      beta_genes[k,l] <- NA
+    } 
+  }
+}
+rm(k,l)
 
-#count the NAs in the 2 dataframes per row in a new data frame
+##Count NA´s in dataframe
 
-rmv.rows_healthy = apply(beta_genes_healthy,1, function(x){sum(is.na(x))})
-rmv.rows_cancer = apply(beta_genes_cancer,1, function(x){sum(is.na(x))})
+rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
-# new beta value data frame where all rows with more than 2 NAs are removed
+##New dataframe out of beta_genes, where all rows with more than 2 NA´s are removed
 
-beta_genes_healthy_cleaned = beta_genes_healthy[-which(rmv.rows_healthy > 2),]
-beta_genes_cancer_cleaned = beta_genes_cancer[-which(rmv.rows_cancer > 2),]
+beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 
-Row_Difference = nrow(beta_genes_cancer)-nrow(beta_genes_cancer_cleaned)
+
+Row_Difference = nrow(genes)-nrow(beta_genes_cleaned)
 View(Row_Difference)
-genes_deleted_cancer_percentage = Row_Difference/nrow(beta_genes_cancer)*100
-sum(genes_deleted_cancer_percentage)
-
-Row_Difference_2 = nrow(beta_genes_healthy)-nrow(beta_genes_healthy_cleaned)
-View(Row_Difference_2)
-genes_deleted_healthy_percentage = Row_Difference_2/nrow(beta_genes_healthy)*100
-sum(genes_deleted_healthy_percentage)
+genes_deleted_percentage = Row_Difference/nrow(genes)*100
+sum(genes_deleted_percentage)
 
 
 #replace beta values for 0 and 1
-beta_genes_healthy_cleaned[beta_genes_healthy_cleaned==0]<-0.00000001
-beta_genes_healthy_cleaned[beta_genes_healthy_cleaned==1]<-0.99999999
+beta_genes_cleaned[beta_genes_cleaned==0]<-0.00000001
+beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 
-beta_genes_cancer_cleaned[beta_genes_cancer_cleaned==0]<-0.00000001
-beta_genes_cancer_cleaned[beta_genes_cancer_cleaned==1]<-0.99999999
+#prepare for normalisation by removing chromosomes from data frame
+
+beta_genes_cleaned <- beta_genes_cleaned[2:11]
+
+#create two separate data frames for sick and healthy patients
+
+beta_genes_healthy <- beta_genes_cleaned[1:5]
+beta_genes_cancer <- beta_genes_cleaned[5:10]
+
+#calculate mean for each row
+rowmeans_healthy <- rowMeans(beta_genes_healthy, na.rm=TRUE)
+rowmeans_cancer <- rowMeans(beta_genes_cancer, na.rm=TRUE)
+
+#change numeric vector to data frame
+rowmeans_healthy <- as.data.frame(rowmeans_healthy)
+rowmeans_cancer <- as.data.frame(rowmeans_cancer)
+
+#replace NA values by row mean 
+beta_genes_healthy[is.na(beta_genes_healthy)] <- rowmeans_healthy
+beta_genes_cancer[is.na(beta_genes_cancer)] <- rowmeans_cancer
 
 #Normalisation: Transform beta-values into M-values
 
-M_genes_h <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
-M_genes_c <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
+M_genes_healthy <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
+M_genes_cancer <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
