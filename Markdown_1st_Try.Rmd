@@ -32,7 +32,7 @@ The analysis will be done in several steps:
 
 ### Data processing
 
-Before we can start analysing our data set it has to be tidied up to make it easy for us to work with it by making it as clear as possible. Datasets have to be split up and reorganized, coloums removed or renamed and a quality control performed.
+Before we can start analysing our data set it has to be tidied up to make it easy for us to work with it by making it as clear as possible. Datasets have to be split up and reorganized, coloums removed or renamed and a quality control concering coverage values, beta values, NAs and specific DNA segments showing unusual values, needs to be performed.
 
 #### Reading in the datasets
 
@@ -59,45 +59,39 @@ tiling <- input_data$tiling
 ```
 
 Those subgroups datasets contain methylation data for different regions on the genome:
-`genes`, `promoters` and `cpgislands`contain genome segments with specific functions and methylation features. Genes, especially highly expressed genes, sometimes show methylation in their gene body. Unfortunately the biological function behind this is not fuly clear yet. Still it can be interesting investigating in their methylation pattern in terms of cancer. In promoters  we already know that methylation plays an important role, because as promoters are the starting point for transcription, their methylation can silence genes laying downstream of these promoters. This way for example tumor suppresor genes don't get expressed any more, which can lead to cancer. Here we expect to find crucial differences in methylation between sick and healthy cells. CpG islands also are important regions on the DNA with a high density of cytosines in neighbourhood to guanines. These CpG islands are often in promoter regions of housekeeping genes and in healthy beeings only rarely methylated, because their methylation usually leads to mistakes in replication and transcription and quickly in death just because functioning promoters are so essential in those genes. Also in those CpG islands a loss of function can lead to cancer, so we expect significant methylation differences. The fourth subgroup is `tiling` which describes a specific section on the genome in steps of 5000 nucleotides without a biological context.
+`genes`, `promoters` and `cpgislands`contain genome segments with specific functions and methylation features. Genes, especially highly expressed genes, sometimes show methylation in their gene body. Unfortunately the biological function behind this is not fully clear yet. Still it can be interesting investigating in their methylation pattern in terms of cancer. In promoters  we already know that methylation plays an important role, because as promoters are the starting point for transcription, their methylation can silence genes laying downstream of these promoters. This way for example tumor suppresor genes don't get expressed any more, which can lead to cancer. Here we expect to find crucial differences in methylation between sick and healthy cells. CpG islands also are important regions on the DNA with a high density of cytosines in neighbourhood to guanines. These CpG islands are often in promoter regions of housekeeping genes and in healthy beeings only rarely methylated, because their methylation usually leads to mistakes in replication and transcription and quickly in death just because functioning promoters are so essential in those genes. Also in those CpG islands a loss of function can lead to cancer, so we expect significant methylation differences. The fourth subgroup is `tiling` which describes a specific section on the genome in steps of 5000 nucleotides without a biological context.
 
-As we want to analyse those subgroups separatly, we first just chose one subgroup, genes, 
-to work on our code. Later we can trnsfer the code on the other subgroups, too.
-In this `genes`dataset we **rename the columns**, which stand for different patients (patient 1 to patient 10). They get short precise names to get the meaning on the first sight.
+As we want to analyse those subgroups separatly, we first just choose one subgroup, `genes`, 
+to work on our code. Later we can transfer the code on the other subgroups, too.
+In this `genes`dataset we **rename the columns**, which stand for different patients (patient 1 to patient 10). They get short precise names to let the reader get the meaning on the first sight.
 
 ```{r}
-names(genes)[11] <- "P1_healthy_beta"
-names(genes)[12] <- "P2_healthy_beta"
-names(genes)[13] <- "P3_healthy_beta"
-names(genes)[14] <- "P4_healthy_beta"
-names(genes)[15] <- "P5_healthy_beta"
-names(genes)[16] <- "P6_CLL_beta"
-names(genes)[17] <- "P7_CLL_beta"
-names(genes)[18] <- "P8_CLL_beta"
-names(genes)[19] <- "P9_CLL_beta"
-names(genes)[20] <- "P10_CLL_beta"
-names(genes)[21] <- "P1_healthy_coverage"
-names(genes)[22] <- "P2_healthy_coverage"
-names(genes)[23] <- "P3_healthy_coverage"
-names(genes)[24] <- "P4_healthy_coverage"
-names(genes)[25] <- "P5_healthy_coverage"
-names(genes)[26] <- "P6_CLL_coverage"
-names(genes)[27] <- "P7_CLL_coverage"
-names(genes)[28] <- "P8_CLL_coverage"
-names(genes)[29] <- "P9_CLL_coverage"
-names(genes)[30] <- "P10_CLL_coverage"
+colnames(genes)[11:30] <- c("P1_healthy_beta","P2_healthy_beta","P3_healthy_beta","P4_healthy_beta","P5_healthy_beta","P6_CLL_beta","P7_CLL_beta","P8_CLL_beta","P9_CLL_beta","P10_CLL_beta","P1_healthy_coverage","P2_healthy_coverage","P3_healthy_coverage","P4_healthy_coverage","P5_healthy_coverage","P6_CLL_coverage","P7_CLL_coverage","P8_CLL_coverage","P9_CLL_coverage","P10_CLL_coverage")
 ```
 
 ####quality control
 
-It is important to remove values that are not needed for or even hinder further analysis. Among other values those are also coverage values, which seem to be unrealistically high due to PCR dublicates or repetetive regions, or are that low, so the belonging beta-value of the DNA section has no meaning, because there was no fitting allignment when mapping back PCR fragments onto the genome. 
+It is important to remove values that are not needed for or even hinder further analysis. Among other values those are also coverage values, which seem to be unrealistically high due to PCR dublicates or repetetive regions. Also they can be or that low, so the belonging beta-value of the DNA section has no meaning, because there was no fitting allignment when mapping back PCR fragments onto the genome. 
 A **data frame only containing coverage values** is created.
 
 ```{r}
-cov_genes <- genes[ ,c(21:30)]
+cov_genes <- genes[,c(1,21:30)]
 ```
 
-There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value contribution among all patients using a logarthmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated and a **logarithmic density plot** using this matrix is generated.
+At this point we already delete some genes, which are the genes on the X- and Y-chromosome. Somehow there must have been problems in obtaining the beta and coverage values for those chromosomes, because the beta-values are either not a number (NaN) or mainly 1.000, which must definitely be a mistake.The belonging coverage is in most cases 0, so we can not use those beta-values values anyway. Following code **removes the X- and Y-chromosome**. 
+
+#####Removing genes on X- and Y-chsomosome
+
+```{r}
+cov_genes_new <- cov_genes[-which(cov_genes =="chrX"),]
+cov_genes <- cov_genes_new[-which(cov_genes_new =="chrY"),]
+rm(cov_genes_new) 
+cov_genes <- cov_genes[ ,c(2:11)]
+```
+
+#####Finding a coverage value threshold
+
+But back to the very high or low coverage values: There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value distribution among all patients using a logarithmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated and a **logarithmic density plot** using this matrix values is generated.
 
 ```{r}
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
@@ -117,10 +111,120 @@ quantile(cov_genes_means, probs = c(.999))
 abline(v=log10(311230.4))
 
 abline(v=log10(10))
+abline(v=log10(15))
 
 ```
 
-Both lower thresholds and the highest upper threshold seem to be fitting looking at the diagram. But which threshold we will chose eventually also depends on the percentage of deleted rows aat the end of quality control.
+Both lower thresholds and the highest upper threshold seem to be fitting looking at the diagram. But which threshold we will chose eventually also depends on the percentage of deleted rows at the end of quality control. It shouldn't be deleted more than 15 % of the rows, because PCA will reduce the amount even more and we don't want to lose too much information.
 
+The procedure will now be to set all the coverage values in `cov_genes`to NA, that are below or above the chosen threshold. Then all the beta-values belonging to those coverage values set to NA will be set to an NA, too. Eventually we will set another threshold for the beta-values, defining above which number of NA per row (meaning gene), the row will be deleted. Therefor we will need two nested for-loops.
+
+#####Preparing the first nested for-loop
+
+Before we can set a threshold, the few **NAs among the coverage values need to be set to 0**. This way they will be set to NAs again after the loop, but they also don't hinder the loop from working.
+
+```{r}
+sum(is.na(cov_genes))
+
+cov_genes[is.na(cov_genes)] <- 0
+```
+
+A **threshold can be chosen**. As the lower threshold we choose the coverage value 15, which is positioned at a kink of the coverage distribution diagram. As the upper coverage threshold we choose the 90 % quantile. Although it is not positioned at a kink in the diagram we consider it to be a good threshold, because it still only leads to a removal of 7(?) % in the end of the quality control, which is far underneath the upper limit of 15 %.
+
+```{r}
+threshold1 <- 15
+
+threshold2 <- quantile(cov_genes_means, probs = seq(0.90,0.90,0.05))
+```
+
+#####The first nested for-loop
+
+Now a **nested for-loop** can set the coverage values underneath and above the set threshold to NA.
+This will be done for each row and each column of the dataframe `cov_genes`.
+
+```{r}
+for(i in 1:nrow(cov_genes)){
+  for(j in 1:ncol(cov_genes)){
+    if(isTRUE(cov_genes[i,j] <= threshold1)){
+      cov_genes[i,j] <- NA
+    } 
+    if(isTRUE(cov_genes[i,j] >= threshold2)){
+      cov_genes[i,j] <- NA
+    }
+  }
+}
+
+rm(i,j,threshold1,threshold2)
+```
+
+#####Preparing the second nested for-loop
+
+A second nested for-loop is used to set the beta-values to NA that belong to the coverage values set to NA. Also here a **dataframe containing only beta-values** is created and the **genes located on the X- or Y-chromosome get removed**.
+
+```{r}
+beta_genes <- genes[,c(1,11:20)]
+
+beta_genes_new <- beta_genes[-which(beta_genes =="chrX"),]
+beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
+rm(beta_genes_new)
+beta_genes <- beta_genes [ ,c(2:11)]
+```
+
+#####The second nested for-loop
+
+This **second nested for-loop** checks every row and every column of the dataframe `cov_genes`.
+If there is an NA, it sets the belonging beta-value in `beta_genes` to NA, too.
+
+```{r}
+for(k in 1:ncol(beta_genes)){
+  for(l in 1:nrow(beta_genes)){
+    if(isTRUE(is.na(cov_genes[k,l] == TRUE))){
+      beta_genes[k,l] <- NA
+    } 
+  }
+}
+rm(k,l)
+```
+
+#####Finding a threshold for NAs among the beta-values
+
+Now the second threshold in quality control needs to be chosen. This one is for the upper and lower threshold of allowed NAs per row (gene) among the beta-values.
+Since some beta-values were set to NA in the last step, we want to get insight in **how many NAs we actually have now**.
+
+```{r}
+rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
+rmv.rows_beta_genes
+```
+
+A new dataframe containing only beta-values for genes which are inside the threshold is created.
+We chose a threshold of 3 allowed NAs per row (gene), so **every row containing more than 3 NAs gets removed**.
+
+```{r}
+beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
+```
+
+To see **how many rows are gone** due to quality control the numer of rows before and after get compared. Also we hava a look at the **percantage of rows deleted** and see wether it is beneath 15 %.
+
+```{r}
+row_difference = nrow(genes)-nrow(beta_genes_cleaned)
+sum(row_difference)
+genes_deleted_percentage = row_difference/nrow(genes)*100
+sum(genes_deleted_percentage)
+```
+
+With 7% we are beneath the recomended upper limit of 15 % of deleted rows.
+
+###Normalisation
+
+The tidy beta-values we have now are an approximation of the percentage of DNA-methylation. Biologically beta-values are easy to understand. They range from 0 to 1, while 0 is unmethylated and 1 is fully methylated. But their bounded range is also a disadvantage. It leads to the problem that they can not be used for statistical tests like the t-test, because they violate the Gaussian distribution. For highly methylated gene regions and unmethylated gene regions beta-values are very heteroscedastic, which means, that the variability of a variable is unequal across the range of values. Therefor we do a normalisation. Beta-values need to be transformed into M-values via a logit transformation. M-values do not have a bounded range, they can be infinite big and small. While the middle methylation range (beta-value range of 0,2-0,8) is linear to M-values, outside this range the beta-values are compressed and the M-values more accurate and homoscedastic. This is why M-values can be used for statistical tests and are absolutely necessary for further analysis.
+
+#####Preparing beta-values for logit transformation
+
+Logit transformation turns the extreme beta-values 0 and 1 into -infinite and infinite. We can not work with those values, because further tests don't know how to deal with an infinite number. Due to that we apply a little trick and **set 0 to a very small number higher than 0, and 1 to a very big number less than 1**.
+
+```{r}
+beta_genes_cleaned[beta_genes_cleaned==0]<-0.00000001
+beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
+```
 
 
