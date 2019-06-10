@@ -157,17 +157,15 @@ beta_genes_cleaned <- beta_genes_cleaned[2:11]
 beta_genes_healthy <- beta_genes_cleaned[1:5]
 beta_genes_cancer <- beta_genes_cleaned[5:10]
 
-#calculate mean for each row
-rowmeans_healthy <- rowMeans(beta_genes_healthy, na.rm=TRUE)
-rowmeans_cancer <- rowMeans(beta_genes_cancer, na.rm=TRUE)
 
-#change numeric vector to data frame
-rowmeans_healthy <- as.data.frame(rowmeans_healthy)
-rowmeans_cancer <- as.data.frame(rowmeans_cancer)
+#replace NAs by row means
 
-#replace NA values by row mean 
-beta_genes_healthy[is.na(beta_genes_healthy)] <- rowmeans_healthy
-beta_genes_cancer[is.na(beta_genes_cancer)] <- rowmeans_cancer
+k <- which(is.na(beta_genes_healthy), arr.ind=TRUE)
+beta_genes_healthy[k] <- rowMeans(beta_genes_healthy, na.rm=TRUE)[k[,1]]
+
+l <- which(is.na(beta_genes_cancer), arr.ind=TRUE)
+beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
+
 
 #Normalisation: Transform beta-values into M-values
 
