@@ -77,7 +77,7 @@ abline(v=log10(10))
 
 #Nested for loop
 
-##Mean of every gene (check for NA´s first and set them to zero if NA´s available)
+##Mean of every gene (check for NAÂ´s first and set them to zero if NAÂ´s available)
 
 sum(is.na(cov_genes))
 
@@ -118,7 +118,7 @@ beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
 rm(beta_genes_new)
 
 
-##Nested for loop to bring Coverage NA´s to beta NA´s
+##Nested for loop to bring Coverage NAÂ´s to beta NAÂ´s
 
 for(k in 1:ncol(beta_genes)){
   for(l in 1:nrow(beta_genes)){
@@ -129,11 +129,11 @@ for(k in 1:ncol(beta_genes)){
 }
 rm(k,l)
 
-##Count NA´s in dataframe
+##Count NAÂ´s in dataframe
 
 rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
-##New dataframe out of beta_genes, where all rows with more than 2 NA´s are removed
+##New dataframe out of beta_genes, where all rows with more than 2 NAÂ´s are removed
 
 beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 
@@ -168,6 +168,46 @@ beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
 
 
 #Normalisation: Transform beta-values into M-values
-
 M_genes_healthy <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
 M_genes_cancer <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
+
+#dataset containing healthy and cancer M-values
+M_genes <- cbind(M_genes_healthy, M_genes_cancer)
+
+#PCA
+
+pca_M <- prcomp(t(M_genes))
+
+#how much variance accounts for the components
+var_pca <- pca_M$sdev^2
+var_pca_per <- round(var_pca/sum(var_pca)*100, 1)
+barplot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", ylim=c(0,25))
+
+#graph of component 1 and 2
+plot(pca_M$x[,1], pca_M$x[,2])
+
+#ggplot of component 1 and 2 
+
+library(ggplot2)
+
+pca_values <- data.frame(Sample=rownames(pca_M$x),
+                       X=pca_M$x[,1],
+                       Y=pca_M$x[,2])
+View(pca_values)
+
+ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_text() +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+#finding the most important 30 genes with have the most influence
+loading_scores <- pca_M$rotation[,1]
+gene_scores <- abs(loading_scores) 
+ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
+genes_top_30 <- names(ranked_gene_score[1:30])
+View(genes_top_30)
+#scores with pos and neg sign
+pca_M$rotation[genes_top_30,1]
+
