@@ -22,8 +22,7 @@ The analysis will be done in several steps:
   * Dimensionality reduction via PCA
   * Featuere selection
 4. **Clustering**
- 
- Via K-means clustering
+  * Via K-means clustering
    
 5. **Identifying DMRs**
 6. **logistic regression**
@@ -91,16 +90,15 @@ cov_genes <- cov_genes[ ,c(2:11)]
 
 #####Finding a coverage value threshold
 
-But back to the very high or low coverage values: There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value distribution among all patients using a logarithmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated and a **logarithmic density plot** using this matrix values is generated.
-
+But back to the very high or low coverage values: There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value distribution among all patients using a logarithmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated.
 ```{r}
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
-plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
 ```
-
+A **logarithmic density plot** using this matrix values is generated.
 To **find an upper threshold** for deleting coverage values we try quantile values we read about in literature and draw the lines for those quantiles in the logarithmic plot to see wether one of those coincidences with a kink in the curve. For the **lower threshold** we draw lines at the values 10 and 15, which are common threshold values as we read in litearture.
 
 ```{r}
+plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
 quantile(cov_genes_means, probs = c(.95))
 abline(v=log10(52529.75))
 
@@ -112,7 +110,6 @@ abline(v=log10(311230.4))
 
 abline(v=log10(10))
 abline(v=log10(15))
-
 ```
 
 Both lower thresholds and the highest upper threshold seem to be fitting looking at the diagram. But which threshold we will chose eventually also depends on the percentage of deleted rows at the end of quality control. It shouldn't be deleted more than 15 % of the rows, because PCA will reduce the amount even more and we don't want to lose too much information.
@@ -193,7 +190,6 @@ Since some beta-values were set to NA in the last step, we want to get insight i
 
 ```{r}
 rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
-rmv.rows_beta_genes
 ```
 
 A new dataframe containing only beta-values for genes which are inside the threshold is created.
