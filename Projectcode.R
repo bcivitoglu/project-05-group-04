@@ -181,7 +181,8 @@ pca_M <- prcomp(t(M_genes))
 #how much variance accounts for the components
 var_pca <- pca_M$sdev^2
 var_pca_per <- round(var_pca/sum(var_pca)*100, 1)
-barplot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", ylim=c(0,25))
+plot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", ylim=c(0,25),type = "o", pch=20)
+
 
 #graph of component 1 and 2
 plot(pca_M$x[,1], pca_M$x[,2])
