@@ -19,37 +19,18 @@ tiling <- input_data$tiling
 
 #Rename our patients in "genes"
 
-names(genes)[11] <- "P1_healthy_beta"
-names(genes)[12] <- "P2_healthy_beta"
-names(genes)[13] <- "P3_healthy_beta"
-names(genes)[14] <- "P4_healthy_beta"
-names(genes)[15] <- "P5_healthy_beta"
-names(genes)[16] <- "P6_CLL_beta"
-names(genes)[17] <- "P7_CLL_beta"
-names(genes)[18] <- "P8_CLL_beta"
-names(genes)[19] <- "P9_CLL_beta"
-names(genes)[20] <- "P10_CLL_beta"
-names(genes)[21] <- "P1_healthy_coverage"
-names(genes)[22] <- "P2_healthy_coverage"
-names(genes)[23] <- "P3_healthy_coverage"
-names(genes)[24] <- "P4_healthy_coverage"
-names(genes)[25] <- "P5_healthy_coverage"
-names(genes)[26] <- "P6_CLL_coverage"
-names(genes)[27] <- "P7_CLL_coverage"
-names(genes)[28] <- "P8_CLL_coverage"
-names(genes)[29] <- "P9_CLL_coverage"
-names(genes)[30] <- "P10_CLL_coverage"
+colnames(genes)[11:30] <- c("P1_healthy_beta","P2_healthy_beta","P3_healthy_beta","P4_healthy_beta","P5_healthy_beta","P6_CLL_beta","P7_CLL_beta","P8_CLL_beta","P9_CLL_beta","P10_CLL_beta","P1_healthy_coverage","P2_healthy_coverage","P3_healthy_coverage","P4_healthy_coverage","P5_healthy_coverage","P6_CLL_coverage","P7_CLL_coverage","P8_CLL_coverage","P9_CLL_coverage","P10_CLL_coverage")
 
 #Create a data frame containing coverage values
 
-cov_genes <- genes[ ,c(21:30)]
+cov_genes <- genes[ ,c(1,21:30)]
 
 ##Remove ChrX and ChrY
 
 cov_genes_new <- cov_genes[-which(cov_genes =="chrX"),]
 cov_genes <- cov_genes_new[-which(cov_genes_new =="chrY"),]
 rm(cov_genes_new)
-
+cov_genes <- cov_genes[ ,c(2:11)]
 
 #Calculate coverage means for each gene
 
@@ -71,8 +52,9 @@ abline(v=log10(82556.55))
 quantile(cov_genes_means, probs = c(.999))
 abline(v=log10(311230.4))
 
-#we set the lower threshold to the coverage value 10 
+#we set the lower threshold to the coverage value 10 and 15
 abline(v=log10(10))
+abline(v=log10(15))
 
 
 #Nested for loop
@@ -116,7 +98,7 @@ beta_genes <- genes[,c(1,11:20)]
 beta_genes_new <- beta_genes[-which(beta_genes =="chrX"),]
 beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
 rm(beta_genes_new)
-
+beta_genes <- beta_genes [ ,c(2:11)]
 
 ##Nested for loop to bring Coverage NAÂ´s to beta NAÂ´s
 
@@ -137,10 +119,9 @@ rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
 beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 
-
-Row_Difference = nrow(genes)-nrow(beta_genes_cleaned)
-View(Row_Difference)
-genes_deleted_percentage = Row_Difference/nrow(genes)*100
+row_difference = nrow(genes)-nrow(beta_genes_cleaned)
+sum(row_difference)
+genes_deleted_percentage = row_difference/nrow(genes)*100
 sum(genes_deleted_percentage)
 
 
