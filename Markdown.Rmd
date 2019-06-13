@@ -1,6 +1,6 @@
 ---
 title: "Cancer methylome analysis CLL vs. B-Cells"
-author: "Leona Brandl, Carlotta Brüggen, Tim Kühn, Violetta Schaaf"
+author: "Leona Brandl, Carlotta BrÃ¼ggen, Tim KÃ¼hn, Violetta Schaaf"
 date: "8th July 2019"
 output: html_document
 ---
@@ -224,3 +224,104 @@ beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 ```
 
 
+Because we only want to work with our beta-values we **remove the first column of beta_genes_cleaned which containes the chromosoms.**
+
+```{r}
+beta_genes_cleaned <- beta_genes_cleaned[,c(2:11)]
+```
+
+#####Creating two seperate data frames for sick and healthy patients
+
+For doing our Normalisation were we transform our beta-values into M-values we have to **split up our data into beta-values of healthy ans sick patients.**
+
+```{r}
+beta_genes_healthy <- beta_genes_cleaned[,c(1:5)]
+beta_genes_cancer <- beta_genes_cleaned[,c(6:10)]
+```
+
+Now we are able to **replace the remained NA's by the row means of the different genes.** We suspect that the rowmeans differ between healthy and sick patients so it is important to work with the two dataframes.
+
+
+```{r}
+k <- which(is.na(beta_genes_healthy), arr.ind=TRUE)
+beta_genes_healthy[k] <- rowMeans(beta_genes_healthy, na.rm=TRUE)[k[,1]]
+
+l <- which(is.na(beta_genes_cancer), arr.ind=TRUE)
+beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
+```
+
+#####Transforming beta-values into M-values
+
+In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data.
+
+```{r}
+M_genes_healthy <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
+M_genes_cancer <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
+```
+
+#####Creating a dataset which contains M-values of sick and healthy patients
+
+For apllying the PCA at our data we have to build a dataset which contains sick and healthy patients. 
+
+```{r}
+M_genes <- cbind(M_genes_healthy, M_genes_cancer)
+```
+
+###PCA
+
+To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller set which still contains most information of the large dataset. Through the PCA correlated variables get transformed into a much smaller number of uncorrelated variables which are called promcipal components.
+We want to have less variebles because it is easier to work with them. 
+
+#####Code for the PCA
+
+The Code for the **PCA** expects the patients to be rows and the samples to be columns. In our data the patients are columns and the genes are rows so we have to **transpose the matrix** with the t() function. 
+
+```{r}
+pca_M <- prcomp(t(M_genes))
+```
+
+#####How much variation do each component account for
+
+To decide with how much principal components we want to work we have to know how much variation each principal component accounts for in percentage. We plot the percentage for each component and decide with the "elbow method" with wich number of copmonents we have to work with. 
+
+```{r}
+var_pca <- pca_M$sdev^2
+var_pca_per <- round(var_pca/sum(var_pca)*100, 1)
+plot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", ylim=c(0,25),type = "o", pch=20)
+```
+
+#####Drawing a 2D plot of component 1 and 2
+
+```{r}
+library(ggplot2)
+
+pca_values <- data.frame(Sample=rownames(pca_M$x),
+                       X=pca_M$x[,1],
+                       Y=pca_M$x[,2])
+View(pca_values)
+
+ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_text() +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+```
+
+#####Looking at the loading scores for the first principal component
+
+Now we want to **find the 30 most important genes** which means we want to find the genes which have the most influence on the principal component one. For that we use the loading scores which we can find in rotation of the PCA. 
+
+```{r}
+loading_scores <- pca_M$rotation[,1]
+gene_scores <- abs(loading_scores) 
+ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
+genes_top_30 <- names(ranked_gene_score[1:30])
+View(genes_top_30)
+```
+
+After that we want to see which genes have positive and which genes have negative loading scores.
+
+```{r}
+pca_M$rotation[genes_top_30,1]
+```
