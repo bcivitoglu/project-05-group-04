@@ -1,6 +1,6 @@
 ---
 title: "Cancer methylome analysis CLL vs. B-Cells"
-author: "Leona Brandl, Carlotta BrÃ¼ggen, Tim KÃ¼hn, Violetta Schaaf"
+author: "Leona Brandl, Carlotta Brüggen, Tim Kühn, Violetta Schaaf"
 date: "8th July 2019"
 output: html_document
 ---
@@ -39,7 +39,6 @@ We start by **reading in our CLL-Bcell-data and the annotations** which is an ex
 
 ```{r}
 input_data <- readRDS(file ="CLL-Bcells_list.RDS.gz")
-
 annotation <- read.csv("sample_annotation.csv")
 ```
 
@@ -49,11 +48,8 @@ Our main dataset, the one containing the data we are working with, is `input_dat
 
 ```{r}
 genes <- input_data$genes
-
 promoters <- input_data$promoters
-
 cpgislands <- input_data$cpgislands
-
 tiling <- input_data$tiling
 ```
 
@@ -101,13 +97,10 @@ To **find an upper threshold** for deleting coverage values we try quantile valu
 plot(density(log10(cov_genes_means)), xlab = "coverage means", main = "coverage distribution")
 quantile(cov_genes_means, probs = c(.95))
 abline(v=log10(52529.75))
-
 quantile(cov_genes_means, probs = c(.975))
 abline(v=log10(82556.55))
-
 quantile(cov_genes_means, probs = c(.999))
 abline(v=log10(311230.4))
-
 abline(v=log10(10))
 abline(v=log10(15))
 ```
@@ -122,7 +115,6 @@ Before we can set a threshold, the few **NAs among the coverage values need to b
 
 ```{r}
 sum(is.na(cov_genes))
-
 cov_genes[is.na(cov_genes)] <- 0
 ```
 
@@ -130,7 +122,6 @@ A **threshold can be chosen**. As the lower threshold we choose the coverage val
 
 ```{r}
 threshold1 <- 15
-
 threshold2 <- quantile(cov_genes_means, probs = seq(0.90,0.90,0.05))
 ```
 
@@ -150,7 +141,6 @@ for(i in 1:nrow(cov_genes)){
     }
   }
 }
-
 rm(i,j,threshold1,threshold2)
 ```
 
@@ -160,7 +150,6 @@ A second nested for-loop is used to set the beta-values to NA that belong to the
 
 ```{r}
 beta_genes <- genes[,c(1,11:20)]
-
 beta_genes_new <- beta_genes[-which(beta_genes =="chrX"),]
 beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
 rm(beta_genes_new)
@@ -223,6 +212,7 @@ beta_genes_cleaned[beta_genes_cleaned==0]<-0.00000001
 beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 ```
 
+
 #####Creating two seperate data frames for sick and healthy patients
 
 For doing our Normalisation were we transform our beta-values into M-values we have to **split up our data into beta-values of healthy ans sick patients.**
@@ -238,7 +228,6 @@ Now we are able to **replace the remained NA's by the row means of the different
 ```{r}
 k <- which(is.na(beta_genes_healthy), arr.ind=TRUE)
 beta_genes_healthy[k] <- rowMeans(beta_genes_healthy, na.rm=TRUE)[k[,1]]
-
 l <- which(is.na(beta_genes_cancer), arr.ind=TRUE)
 beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
 ```
@@ -262,8 +251,8 @@ M_genes <- cbind(M_genes_healthy, M_genes_cancer)
 
 ###PCA
 
-To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller set which still contains most information of the large dataset. Through the PCA correlated variables get transformed into a much smaller number of uncorrelated variables which are called promcipal components.
-We want to have less variebles because it is easier to work with them. 
+To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller set which still contains most information of the large dataset. Through the PCA, correlated variables get transformed into a much smaller number of uncorrelated variables which are called promcipal components.
+We want to have less variebles, because it is easier to work with them. 
 
 #####Code for the PCA
 
@@ -287,12 +276,10 @@ plot(var_pca_per, main="variation of our data", xlab="Principal Components", yla
 
 ```{r}
 library(ggplot2)
-
 pca_values <- data.frame(Sample=rownames(pca_M$x),
                        X=pca_M$x[,1],
                        Y=pca_M$x[,2])
 View(pca_values)
-
 ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_text() +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
