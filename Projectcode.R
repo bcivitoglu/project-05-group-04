@@ -59,7 +59,7 @@ abline(v=log10(15))
 
 #Nested for loop
 
-##Mean of every gene (check for NAÂ´s first and set them to zero if NAÂ´s available)
+##Mean of every gene (check for NAÃÂ´s first and set them to zero if NAÃÂ´s available)
 
 sum(is.na(cov_genes))
 
@@ -100,7 +100,7 @@ beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
 rm(beta_genes_new)
 beta_genes <- beta_genes [ ,c(2:11)]
 
-##Nested for loop to bring Coverage NAÂ´s to beta NAÂ´s
+##Nested for loop to bring Coverage NAÃÂ´s to beta NAÃÂ´s
 
 for(k in 1:ncol(beta_genes)){
   for(l in 1:nrow(beta_genes)){
@@ -111,11 +111,11 @@ for(k in 1:ncol(beta_genes)){
 }
 rm(k,l)
 
-##Count NAÂ´s in dataframe
+##Count NAÃÂ´s in dataframe
 
 rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
-##New dataframe out of beta_genes, where all rows with more than 2 NAÂ´s are removed
+##New dataframe out of beta_genes, where all rows with more than 2 NAÃÂ´s are removed
 
 beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 
@@ -131,12 +131,12 @@ beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 
 #prepare for normalisation by removing chromosomes from data frame
 
-beta_genes_cleaned <- beta_genes_cleaned[2:11]
+beta_genes_cleaned <- beta_genes_cleaned[,c(2:11)]
 
 #create two separate data frames for sick and healthy patients
 
-beta_genes_healthy <- beta_genes_cleaned[1:5]
-beta_genes_cancer <- beta_genes_cleaned[5:10]
+beta_genes_healthy <- beta_genes_cleaned[,c(1:5)]
+beta_genes_cancer <- beta_genes_cleaned[,c(6:10)]
 
 
 #replace NAs by row means
