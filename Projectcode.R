@@ -129,9 +129,6 @@ sum(genes_deleted_percentage)
 beta_genes_cleaned[beta_genes_cleaned==0]<-0.00000001
 beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 
-#prepare for normalisation by removing chromosomes from data frame
-
-beta_genes_cleaned <- beta_genes_cleaned[,c(2:11)]
 
 #create two separate data frames for sick and healthy patients
 
