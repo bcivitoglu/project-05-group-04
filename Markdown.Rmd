@@ -275,6 +275,7 @@ plot(var_pca_per, main="variation of our data", xlab="Principal Components", yla
 #####Drawing a 2D plot of component 1 and 2
 
 ```{r}
+install.packages("ggplot2")
 library(ggplot2)
 pca_values <- data.frame(Sample=rownames(pca_M$x),
                        X=pca_M$x[,1],

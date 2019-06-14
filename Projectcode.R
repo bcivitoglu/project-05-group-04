@@ -152,6 +152,10 @@ M_genes_cancer <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
 #dataset containing healthy and cancer M-values
 M_genes <- cbind(M_genes_healthy, M_genes_cancer)
 
+#Rename columns to shorter names
+
+colnames(M_genes) <- c("1H","2H","3H","4H","5H","6CLL","7CLL","8CLL","9CLL","10CLL")
+
 #PCA
 
 pca_M <- prcomp(t(M_genes))
@@ -159,34 +163,249 @@ pca_M <- prcomp(t(M_genes))
 #how much variance accounts for the components
 var_pca <- pca_M$sdev^2
 var_pca_per <- round(var_pca/sum(var_pca)*100, 1)
-plot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", ylim=c(0,25),type = "o", pch=20)
+plot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", xlim = c(0,11), ylim=c(0,25),type = "o", pch=20)
 
 
-#graph of component 1 and 2
-plot(pca_M$x[,1], pca_M$x[,2])
+#graph of component 1 - 9
+#par(mfrow = c(3,3)) ACHTUNG GEFAHR!
+#install.packages("gridExtra")
+#library(gridExtra)
 
-#ggplot of component 1 and 2 
-
+#graph of component 1 - 9
+install.packages("ggplot2")
 library(ggplot2)
 
-pca_values <- data.frame(Sample=rownames(pca_M$x),
-                       X=pca_M$x[,1],
-                       Y=pca_M$x[,2])
-View(pca_values)
+##With PC1
+## 1&2
+pca_values2 <- data.frame(Sample=rownames(pca_M$x),
+                         X=pca_M$x[,1],
+                         Y=pca_M$x[,2])
 
-ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
-  geom_text() +
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$cellTypeGroup)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
   ggtitle("PCA Graph")
 
-#finding the most important 30 genes with have the most influence
+## 1&3
+pca_values3 <- data.frame(Sample=rownames(pca_M$x),
+                         X=pca_M$x[,1],
+                         Y=pca_M$x[,3])
+
+ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$cellTypeGroup)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&4
+pca_values4 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,4])
+
+ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$cellTypeGroup)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&5
+pca_values5 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,5])
+
+ggplot(data=pca_values5, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC5 - ", var_pca_per[5], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&6
+pca_values6 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,6])
+
+ggplot(data=pca_values6, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC6 - ", var_pca_per[6], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&7
+pca_values7 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,7])
+
+ggplot(data=pca_values7, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC7 - ", var_pca_per[7], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&8
+pca_values8 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,8])
+
+ggplot(data=pca_values8, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC8 - ", var_pca_per[8], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&9
+pca_values9 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,9])
+
+ggplot(data=pca_values9, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC9 - ", var_pca_per[9], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 1&10
+pca_values10 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,10])
+
+ggplot(data=pca_values10, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC10 - ", var_pca_per[10], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+##With PC 2
+## 2&3
+pca_values23 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,3])
+
+ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$cellTypeGroup)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&4
+pca_values24 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,4])
+
+ggplot(data=pca_values24, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$cellTypeGroup)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&5
+pca_values25 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,5])
+
+ggplot(data=pca_values25, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$cellTypeGroup)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC5 - ", var_pca_per[5], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&6
+pca_values26 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,6])
+
+ggplot(data=pca_values5, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC6 - ", var_pca_per[6], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&7
+pca_values27 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,7])
+
+ggplot(data=pca_values27, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC7 - ", var_pca_per[7], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&8
+pca_values28 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,8])
+
+ggplot(data=pca_values28, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC8 - ", var_pca_per[8], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&9
+pca_values29 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,9])
+
+ggplot(data=pca_values29, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC9 - ", var_pca_per[9], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+## 2&10
+pca_values210 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,2],
+                          Y=pca_M$x[,10])
+
+ggplot(data=pca_values210, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$Predicted.Gender)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC10 - ", var_pca_per[10], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+
+#gg plot divide by shape and colour
+
+ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA with PC 1 & 2 and check for sex")
+
+
+#finding the most important 30 genes which have the most influence
 loading_scores <- pca_M$rotation[,1]
 gene_scores <- abs(loading_scores) 
 ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
 genes_top_30 <- names(ranked_gene_score[1:30])
 View(genes_top_30)
+
 #scores with pos and neg sign
 pca_M$rotation[genes_top_30,1]
+View(pca_M$rotation[genes_top_30,1])
+
+#Look for elbow in top gene variance
+plot(abs(pca_M$rotation[genes_top_30,1]),type = "o", pch=20)
+
+
+
 
