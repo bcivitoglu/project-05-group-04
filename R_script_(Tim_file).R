@@ -32,6 +32,10 @@ threshhold1 <- 10
 
 threshhold2 <- quantile(cov_genes_mean, probs = seq(0.95,0.95,0.05))
 
+##Forloop umgehen? klappt nicht
+
+cov_genes[cov_genes<=threshhold1] <- NA
+cov_genes[cov_genes>=threshhold2] <- NA
 
 ##Nested for loop 
 
@@ -75,7 +79,7 @@ rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
 ##New dataframe out of beta_genes, where all rows with more than 2 NA´s are removed
 
-beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
+beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >0),]
 
 
 ##Make a dataframe with cleaned beta values and the associated chromosome
