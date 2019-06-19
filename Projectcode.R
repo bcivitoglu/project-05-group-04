@@ -212,77 +212,6 @@ ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   theme_bw() +
   ggtitle("PCA Graph")
 
-## 1&5
-pca_values5 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,5])
-
-ggplot(data=pca_values5, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC5 - ", var_pca_per[5], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 1&6
-pca_values6 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,6])
-
-ggplot(data=pca_values6, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC6 - ", var_pca_per[6], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 1&7
-pca_values7 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,7])
-
-ggplot(data=pca_values7, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC7 - ", var_pca_per[7], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 1&8
-pca_values8 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,8])
-
-ggplot(data=pca_values8, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC8 - ", var_pca_per[8], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 1&9
-pca_values9 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,9])
-
-ggplot(data=pca_values9, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC9 - ", var_pca_per[9], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 1&10
-pca_values10 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,10])
-
-ggplot(data=pca_values10, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC10 - ", var_pca_per[10], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
 
 ##With PC 2
 ## 2&3
@@ -309,77 +238,20 @@ ggplot(data=pca_values24, aes(x=X, y=Y, label=Sample)) +
   theme_bw() +
   ggtitle("PCA Graph")
 
-## 2&5
-pca_values25 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,5])
 
-ggplot(data=pca_values25, aes(x=X, y=Y, label=Sample)) +
+##With PC 3
+## 3&4
+pca_values34 <- data.frame(Sample=rownames(pca_M$x),
+                           X=pca_M$x[,3],
+                           Y=pca_M$x[,4])
+
+ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$cellTypeGroup)) +
-  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  ylab(paste("PC5 - ", var_pca_per[5], "%", sep="")) +
+  xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
   ggtitle("PCA Graph")
 
-## 2&6
-pca_values26 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,6])
-
-ggplot(data=pca_values5, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  ylab(paste("PC6 - ", var_pca_per[6], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 2&7
-pca_values27 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,7])
-
-ggplot(data=pca_values27, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  ylab(paste("PC7 - ", var_pca_per[7], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 2&8
-pca_values28 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,8])
-
-ggplot(data=pca_values28, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  ylab(paste("PC8 - ", var_pca_per[8], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 2&9
-pca_values29 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,9])
-
-ggplot(data=pca_values29, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  ylab(paste("PC9 - ", var_pca_per[9], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
-
-## 2&10
-pca_values210 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,10])
-
-ggplot(data=pca_values210, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$Predicted.Gender)) +
-  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  ylab(paste("PC10 - ", var_pca_per[10], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA Graph")
 
 
 #gg plot divide by shape and colour
@@ -390,6 +262,196 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
   ggtitle("PCA with PC 1 & 2 and check for sex")
+
+#investigation for batch effekt
+#PC1&2
+
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+
+#PC1&3
+
+ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+
+#PC1&4
+
+ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+
+#PC2&3
+
+ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+  xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+
+#PC3&4
+
+ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
+  xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+  xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+  xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
+
+ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+  xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+  ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PCA Graph")
 
 
 #finding the most important 30 genes which have the most influence
