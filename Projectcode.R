@@ -468,6 +468,152 @@ View(pca_M$rotation[genes_top_30,1])
 #Look for elbow in top gene variance
 plot(abs(pca_M$rotation[genes_top_30,1]),type = "o", pch=20)
 
+#create dataframes containing PC1-5 and variable of annotation we want to get p value of
+x <- pca_M[["x"]]
+pca1_5 <- x[,1:5]
+batch_kruskal <- data.frame(pca1_5, annotation$SAMPLE_DESC_3)
+batch_wilcoxon <- data.frame(pca1_5, annotation$BIOMATERIAL_PROVIDER, annotation$DISEASE, annotation$Predicted.Gender)
+batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
+
+#Permutation test for numers
+
+cor.perm <- function (x, y, nperm = 1000)
+{
+  r.obs <- cor (x = x, y = y)
+  P.par <- cor.test (x = x, y = y)$p.value
+  #  r.per <- replicate (nperm, expr = cor (x = x, y = sample (y)))
+  r.per <- sapply (1:nperm, FUN = function (i) cor (x = x, y = sample (y)))
+  r.per <- c(r.per, r.obs)
+  hist (r.per, xlim = c(-1,1))
+  abline (v = r.obs, col = 'red')
+  P.per <- sum (abs (r.per) >= abs (r.obs))/(nperm + 1) 
+  return(list(r.obs = r.obs, P.par = P.par, P.per = P.per))
+}
+
+x <-batch_permutation$PC1
+y <-batch_permutation$annotation.SEQ_RUNS_COUNT
+
+p_PC1_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC2
+p_PC2_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC3
+p_PC3_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC4
+p_PC4_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC5
+p_PC5_SEQ <- cor.perm(x,y)
+
+p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per, p_PC4_SEQ$P.per, p_PC5_SEQ$P.per)
+
+#Wilcoxon test for 2 categories
+
+pc_1_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_2_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_3_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_4_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_5_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+
+pc_1_BIOMATERIAL_PROVIDER <- pc_1_BIOMATERIAL_PROVIDER$p.value
+pc_2_BIOMATERIAL_PROVIDER <- pc_2_BIOMATERIAL_PROVIDER$p.value
+pc_3_BIOMATERIAL_PROVIDER <- pc_3_BIOMATERIAL_PROVIDER$p.value
+pc_4_BIOMATERIAL_PROVIDER <- pc_4_BIOMATERIAL_PROVIDER$p.value
+pc_5_BIOMATERIAL_PROVIDER <- pc_5_BIOMATERIAL_PROVIDER$p.value
+
+pc_1_DISEASE <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_2_DISEASE <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_3_DISEASE <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_4_DISEASE <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_5_DISEASE <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+
+pc_1_DISEASE <- pc_1_DISEASE$p.value
+pc_2_DISEASE <- pc_2_DISEASE$p.value
+pc_3_DISEASE <- pc_3_DISEASE$p.value
+pc_4_DISEASE <- pc_4_DISEASE$p.value
+pc_5_DISEASE <- pc_5_DISEASE$p.value
+
+pc_1_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_2_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_3_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_4_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_5_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+
+pc_1_Predicted.Gender <- pc_1_Predicted.Gender$p.value
+pc_2_Predicted.Gender <- pc_2_Predicted.Gender$p.value
+pc_3_Predicted.Gender <- pc_3_Predicted.Gender$p.value
+pc_4_Predicted.Gender <- pc_4_Predicted.Gender$p.value
+pc_5_Predicted.Gender <- pc_5_Predicted.Gender$p.value
+
+p_DISEASE <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL_PROVIDER, pc_3_BIOMATERIAL_PROVIDER, pc_4_BIOMATERIAL_PROVIDER, pc_5_BIOMATERIAL_PROVIDER)
+p_BIOMATERIAL_PROVIDER <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL_PROVIDER, pc_3_BIOMATERIAL_PROVIDER, pc_4_BIOMATERIAL_PROVIDER, pc_5_BIOMATERIAL_PROVIDER)
+p_Predicted.Gender <- data.frame(pc_1_Predicted.Gender, pc_2_Predicted.Gender, pc_3_Predicted.Gender, pc_4_Predicted.Gender, pc_5_Predicted.Gender)
+
+
+#Kruskal-Wallis for several categories
+batch_kruskal <- within(batch_kruskal, {
+  PC1 <- as.numeric(as.character(PC1))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC2 <- as.numeric(as.character(PC2))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC3 <- as.numeric(as.character(PC3))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC4 <- as.numeric(as.character(PC4))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC5 <- as.numeric(as.character(PC5))
+})
+
+sample_desc_3_pc1 <- kruskal.test(batch_kruskal$PC1 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc2 <- kruskal.test(batch_kruskal$PC2 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc3 <- kruskal.test(batch_kruskal$PC3 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc4 <- kruskal.test(batch_kruskal$PC4 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc5 <- kruskal.test(batch_kruskal$PC5 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+
+p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.value, sample_desc_3_pc3$p.value, sample_desc_3_pc4$p.value, sample_desc_3_pc5$p.value)
+
+
+
+
+#ansatz eines verkrüppelten nicht funktionierenden loops
+##kruskal_list <- batch_kruskal[,c(1:5)]
+##batch_sample_desc_3 <- for (i in 1:5){kruskal.test(kruskal_list[,i] ~ batch_kruskal$annotation.SAMPLE_DESC_3)}
+
+#dataframe erstellen, das alle p values der Kategorien, die wir auf einen Batch Effekt untersuchen, enthält
+
+p_DISEASE_t <- as.data.frame(t(p_DISEASE))
+p_BIOMATERIAL_PROVIDER_t <- as.data.frame(t(p_BIOMATERIAL_PROVIDER))
+p_Predicted.Gender_t <- as.data.frame(t(p_Predicted.Gender))
+p_SEQ_RUNS_COUNT_t <- as.data.frame(t(p_SEQ_RUNS_COUNT))
+p_SAMPLE_DESC_3_t <- as.data.frame(t( p_SAMPLE_DESC_3))
+
+total_pvalue <- cbind(p_DISEASE_t,p_BIOMATERIAL_PROVIDER_t,p_Predicted.Gender_t,p_SEQ_RUNS_COUNT_t,p_SAMPLE_DESC_3_t)
+
+names(total_pvalue)[1] <- "p_DISEASE"
+names(total_pvalue)[2] <- "p_BIOMATERIAL"
+names(total_pvalue)[3] <- "p_GENDER"
+names(total_pvalue)[4] <- "p_SEQ_RUNS_COUNT"
+names(total_pvalue)[5] <- "p_SAMPLE_DESC"
+
+#rename rows
+
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_1_BIOMATERIAL_PROVIDER"] <- "PC1"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_2_BIOMATERIAL_PROVIDER"] <- "PC2"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_3_BIOMATERIAL_PROVIDER"] <- "PC3"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_4_BIOMATERIAL_PROVIDER"] <- "PC4"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <- "PC5"
+
+#transform dataframe into a matrix
+total_pvalue <- data.matrix(total_pvalue)
 
 
 
