@@ -52,7 +52,10 @@ promoters <- input_data$promoters
 cpgislands <- input_data$cpgislands
 tiling <- input_data$tiling
 ```
-
+### We check if important genes are in our Dataset which we found in literature
+```{r}
+grep("symbol", genes$symbol, value = TRUE)
+```
 Those subgroups datasets contain methylation data for different regions on the genome:
 `genes`, `promoters` and `cpgislands`contain genome segments with specific functions and methylation features. Genes, especially highly expressed genes, sometimes show methylation in their gene body. Unfortunately the biological function behind this is not fully clear yet. Still it can be interesting investigating in their methylation pattern in terms of cancer. In promoters  we already know that methylation plays an important role, because as promoters are the starting point for transcription, their methylation can silence genes laying downstream of these promoters. This way for example tumor suppresor genes don't get expressed any more, which can lead to cancer. Here we expect to find crucial differences in methylation between sick and healthy cells. CpG islands also are important regions on the DNA with a high density of cytosines in neighbourhood to guanines. These CpG islands are often in promoter regions of housekeeping genes and in healthy beeings only rarely methylated, because their methylation usually leads to mistakes in replication and transcription and quickly in death just because functioning promoters are so essential in those genes. Also in those CpG islands a loss of function can lead to cancer, so we expect significant methylation differences. The fourth subgroup is `tiling` which describes a specific section on the genome in steps of 5000 nucleotides without a biological context.
 
