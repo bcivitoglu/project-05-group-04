@@ -59,7 +59,7 @@ abline(v=log10(15))
 
 #Nested for loop
 
-##Mean of every gene (check for NAÃÂ´s first and set them to zero if NAÃÂ´s available)
+##Mean of every gene (check for NAÃÂÃÂ´s first and set them to zero if NAÃÂÃÂ´s available)
 
 sum(is.na(cov_genes))
 
@@ -100,7 +100,7 @@ beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
 rm(beta_genes_new)
 beta_genes <- beta_genes [ ,c(2:11)]
 
-##Nested for loop to bring Coverage NAÃÂ´s to beta NAÃÂ´s
+##Nested for loop to bring Coverage NAÃÂÃÂ´s to beta NAÃÂÃÂ´s
 
 for(k in 1:ncol(beta_genes)){
   for(l in 1:nrow(beta_genes)){
@@ -111,11 +111,11 @@ for(k in 1:ncol(beta_genes)){
 }
 rm(k,l)
 
-##Count NAÃÂ´s in dataframe
+##Count NAÃÂÃÂ´s in dataframe
 
 rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
-##New dataframe out of beta_genes, where all rows with more than 2 NAÃÂ´s are removed
+##New dataframe out of beta_genes, where all rows with more than 2 NAÃÂÃÂ´s are removed
 
 beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 
@@ -584,11 +584,11 @@ p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.val
 
 
 
-#ansatz eines verkrüppelten nicht funktionierenden loops
+#ansatz eines verkrÃ¼ppelten nicht funktionierenden loops
 ##kruskal_list <- batch_kruskal[,c(1:5)]
 ##batch_sample_desc_3 <- for (i in 1:5){kruskal.test(kruskal_list[,i] ~ batch_kruskal$annotation.SAMPLE_DESC_3)}
 
-#dataframe erstellen, das alle p values der Kategorien, die wir auf einen Batch Effekt untersuchen, enthält
+#dataframe erstellen, das alle p values der Kategorien, die wir auf einen Batch Effekt untersuchen, enthÃ¤lt
 
 p_DISEASE_t <- as.data.frame(t(p_DISEASE))
 p_BIOMATERIAL_PROVIDER_t <- as.data.frame(t(p_BIOMATERIAL_PROVIDER))
@@ -615,5 +615,52 @@ rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <-
 #transform dataframe into a matrix
 total_pvalue <- data.matrix(total_pvalue)
 
+#heatmap testing
+
+heatmap(total_pvalue, main = "batch effect in our principal components", sepwidth = c(0.05, 0.05), col = colorRamp(c("blue", "salmon")), breaks = c(seq(0, 0.05, length = 3),seq(0.011, 1, length = 2)),colsep = 1:ncol(total_pvalue), rowsep = 1:nrow(total_pvalue))
 
 
+       
+#create a dataframe with loading scores of the 2000 most importat genes for principal component 2 
+
+loading_scores <- pca_M$rotation[,2]
+gene_scores <- abs(loading_scores) 
+ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
+genes_top_2000 <- names(ranked_gene_score[1:2000])
+
+
+#build a dataframe containing all M-values from the 2000 most important genes for principal component 2 
+k_means_data <- M_genes[genes_top_2000,]
+
+#clustering with k-means
+
+k <- kmeans(x = t(k_means_data), centers = 2, iter.max = 1000)
+k <-
+  kmeans(
+    x = t(k_means_data),
+    centers = 2,
+    iter.max = 1000
+  )
+View(k)
+
+#t-test (students t-test)
+
+cluster <- k[["cluster"]]
+p_value = NULL
+for(i in 1:nrow(k_means_data)){
+  x = k_means_data[i, 1:5]
+  y = k_means_data[i, 6:10]
+  t_test = t.test(x, y)
+  p_value[i] = t_test$p.value
+}
+
+#create a dataframe wich contains the p-values from t-test in rising order
+
+pvalues <- data.frame(p_value)
+pvalues <- sort(pvalues$p_value, decreasing = F)
+pvalues <- data.frame(pvalues)
+
+#this is just for our markdown where we have to show our clusters, we have to deleate it in our code after wie made the markdown
+View(beta_genes_healthy)
+cluster <- data.frame(k[["cluster"]])
+View(cluster)
