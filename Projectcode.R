@@ -617,7 +617,23 @@ total_pvalue <- data.matrix(total_pvalue)
 
 #heatmap testing
 
-heatmap(total_pvalue, main = "batch effect in our principal components", sepwidth = c(0.05, 0.05), col = colorRamp(c("blue", "salmon")), breaks = c(seq(0, 0.05, length = 3),seq(0.011, 1, length = 2)),colsep = 1:ncol(total_pvalue), rowsep = 1:nrow(total_pvalue))
+#preparation for heatmap
+
+for (i in 1:ncol(total_pvalue)){
+  for (j in 1:nrow(total_pvalue)){
+    if(isTRUE(total_pvalue[i,j] > 0.1)){
+      total_pvalue[i,j] <- 10
+    }
+    if (isTRUE(total_pvalue[i,j] <= 0.1)){
+      total_pvalue [i,j] <- 1
+    }
+  }
+}
+
+
+#heatmap 
+
+heatmap.2(total_pvalue, main = "batch effect in our principal components", Colv = NA, Rowv = NA, dendrogram = "none", sepwidth = c(0.01, 0.01), sepcolor = "black", trace= "none", col = colorRampPalette(c("salmon","blue")), breaks = c(seq(0, 1, length = 2),seq(1.1, 10, length = 2)),colsep = 1:ncol(total_pvalue), rowsep = 1:nrow(total_pvalue), key=FALSE)
 
 
        
