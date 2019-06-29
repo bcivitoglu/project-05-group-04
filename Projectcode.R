@@ -59,7 +59,7 @@ abline(v=log10(15))
 
 #Nested for loop
 
-##Mean of every gene (check for NAÃÂÃÂ´s first and set them to zero if NAÃÂÃÂ´s available)
+##Mean of every gene (check for NA????????????????s first and set them to zero if NA????????????????s available)
 
 sum(is.na(cov_genes))
 
@@ -100,7 +100,7 @@ beta_genes <- beta_genes_new[-which(beta_genes_new =="chrY"),]
 rm(beta_genes_new)
 beta_genes <- beta_genes [ ,c(2:11)]
 
-##Nested for loop to bring Coverage NAÃÂÃÂ´s to beta NAÃÂÃÂ´s
+##Nested for loop to bring Coverage NAs to beta NAs
 
 for(k in 1:ncol(beta_genes)){
   for(l in 1:nrow(beta_genes)){
@@ -111,11 +111,11 @@ for(k in 1:ncol(beta_genes)){
 }
 rm(k,l)
 
-##Count NAÃÂÃÂ´s in dataframe
+##Count NA????????????????s in dataframe
 
 rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 
-##New dataframe out of beta_genes, where all rows with more than 2 NAÃÂÃÂ´s are removed
+##New dataframe out of beta_genes, where all rows with more than 2 NAs are removed
 
 beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 
@@ -163,23 +163,25 @@ pca_M <- prcomp(t(M_genes))
 #how much variance accounts for the components
 var_pca <- pca_M$sdev^2
 var_pca_per <- round(var_pca/sum(var_pca)*100, 1)
-plot(var_pca_per, main="variation of our data", xlab="Principal Components", ylab="Percent Variation", xlim = c(0,11), ylim=c(0,25),type = "o", pch=20)
+plot(var_pca_per, main="Variation of our data explained by PCs", xlab="Principal Components", ylab="Percentage of variation explained by PC", xlim = c(0,11), ylim=c(0,25),type = "o", pch=20)
+##There is not a clear kink in the first PC, therefor we actually have to investigate on all 9 PCs, but the last ones don't explain a lot of variance anyway so we just have a look at the first 4 PCs.
 
 
-#graph of component 1 - 9
-#par(mfrow = c(3,3)) ACHTUNG GEFAHR!
+
+#graph of component 1 - 4
+#par(mfrow = c(3,3)) ACHTUNG GEFAHR! Hier muss noch ein guter code gefunden werden um grafen schön nebeneinander zu präsentieren
 #install.packages("gridExtra")
 #library(gridExtra)
 
-#graph of component 1 - 9
-install.packages("ggplot2")
+#graph of component 1 - 4
+##install.packages("ggplot2")
 library(ggplot2)
 
 ##With PC1
 ## 1&2
 pca_values2 <- data.frame(Sample=rownames(pca_M$x),
-                         X=pca_M$x[,1],
-                         Y=pca_M$x[,2])
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,2])
 
 ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$cellTypeGroup)) +
@@ -190,8 +192,8 @@ ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
 
 ## 1&3
 pca_values3 <- data.frame(Sample=rownames(pca_M$x),
-                         X=pca_M$x[,1],
-                         Y=pca_M$x[,3])
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,3])
 
 ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$cellTypeGroup)) +
@@ -216,8 +218,8 @@ ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
 ##With PC 2
 ## 2&3
 pca_values23 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,3])
+                           X=pca_M$x[,2],
+                           Y=pca_M$x[,3])
 
 ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$cellTypeGroup)) +
@@ -228,8 +230,8 @@ ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
 
 ## 2&4
 pca_values24 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,2],
-                          Y=pca_M$x[,4])
+                           X=pca_M$x[,2],
+                           Y=pca_M$x[,4])
 
 ggplot(data=pca_values24, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$cellTypeGroup)) +
@@ -254,16 +256,8 @@ ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
 
 
 
-#gg plot divide by shape and colour
-
-ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
-  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
-  ggtitle("PCA with PC 1 & 2 and check for sex")
-
 #investigation for batch effekt
+#gg plot divide by shape and colour
 #PC1&2
 
 ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
@@ -271,35 +265,37 @@ ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&2 check for gender")
 
+#dieser kann eigentlich raus oder? denn submission date sagt eigentlich nichts aus, da wir nicht wissen, was mit submission date eigentlich gemeint ist.
 ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&2 check for submission date")
 
 ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&2 check for cell type/origin")
 
+#sagt dieser plot über das alter überhaupt etwas aus ? da wir so viele kategorien haben?
 ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&2 check for age")
 
 ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&2 check for biomaterial provider")
 
 
 #PC1&3
@@ -309,35 +305,35 @@ ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&3 check for gender")
 
 ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&3 check for submission date")
 
 ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&3 check for cell type/origin")
 
 ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&3 check for age")
 
 ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&3 check for biomaterial provider")
 
 
 #PC1&4
@@ -347,35 +343,35 @@ ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&4 check for gender")
 
 ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&4 check for submission date")
 
 ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&4 check for cell type/origin")
 
 ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&4 check for age")
 
 ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC1&4 check for biomaterial provider")
 
 
 #PC2&3
@@ -385,35 +381,35 @@ ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC2&3 check for gender")
 
 ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
   xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC2&3 check for submission date")
 
 ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC2&3 check for cell type/origin")
 
 ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC2&3 check for age")
 
 ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC2&3 check for biomaterial provider")
 
 
 #PC3&4
@@ -423,59 +419,50 @@ ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
   xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC3&4 check for gender")
 
 ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$FIRST_SUBMISSION_DATE)) +
   xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC3&4 check for submission date")
 
 ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC3&4 check for cell type/origin")
 
 ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC3&4 check for age")
 
 ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PC3&4 check for biomaterial provider")
 
 
-#finding the most important 30 genes which have the most influence
-loading_scores <- pca_M$rotation[,1]
-gene_scores <- abs(loading_scores) 
-ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
-genes_top_30 <- names(ranked_gene_score[1:30])
-View(genes_top_30)
 
-#scores with pos and neg sign
-pca_M$rotation[genes_top_30,1]
-View(pca_M$rotation[genes_top_30,1])
-
-#Look for elbow in top gene variance
-plot(abs(pca_M$rotation[genes_top_30,1]),type = "o", pch=20)
+#checking our PC 1 to 5 for significant batch effect per category 
 
 #create dataframes containing PC1-5 and variable of annotation we want to get p value of
+#depending on the type of category (numbers, 2 categories, more than 2 different categories, aber im Markdown etwas ausführlicher erklären)
 x <- pca_M[["x"]]
 pca1_5 <- x[,1:5]
 batch_kruskal <- data.frame(pca1_5, annotation$SAMPLE_DESC_3)
 batch_wilcoxon <- data.frame(pca1_5, annotation$BIOMATERIAL_PROVIDER, annotation$DISEASE, annotation$Predicted.Gender)
 batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 
-#Permutation test for numers
+#Permutation test for numbers
+#was ist mit der histogramm zeile? wir brauchen doch kein histogram an der stelle oder ?
 
 cor.perm <- function (x, y, nperm = 1000)
 {
@@ -584,11 +571,11 @@ p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.val
 
 
 
-#ansatz eines verkrÃ¼ppelten nicht funktionierenden loops
+#ansatz eines verkrüppelten nicht funktionierenden loops
 ##kruskal_list <- batch_kruskal[,c(1:5)]
 ##batch_sample_desc_3 <- for (i in 1:5){kruskal.test(kruskal_list[,i] ~ batch_kruskal$annotation.SAMPLE_DESC_3)}
 
-#dataframe erstellen, das alle p values der Kategorien, die wir auf einen Batch Effekt untersuchen, enthÃ¤lt
+#dataframe erstellen, das alle p values der Kategorien, die wir auf einen Batch Effekt untersuchen, enthält
 
 p_DISEASE_t <- as.data.frame(t(p_DISEASE))
 p_BIOMATERIAL_PROVIDER_t <- as.data.frame(t(p_BIOMATERIAL_PROVIDER))
@@ -598,6 +585,7 @@ p_SAMPLE_DESC_3_t <- as.data.frame(t( p_SAMPLE_DESC_3))
 
 total_pvalue <- cbind(p_DISEASE_t,p_BIOMATERIAL_PROVIDER_t,p_Predicted.Gender_t,p_SEQ_RUNS_COUNT_t,p_SAMPLE_DESC_3_t)
 
+#give columns informative names
 names(total_pvalue)[1] <- "p_DISEASE"
 names(total_pvalue)[2] <- "p_BIOMATERIAL"
 names(total_pvalue)[3] <- "p_GENDER"
@@ -605,7 +593,6 @@ names(total_pvalue)[4] <- "p_SEQ_RUNS_COUNT"
 names(total_pvalue)[5] <- "p_SAMPLE_DESC"
 
 #rename rows
-
 rownames(total_pvalue)[rownames(total_pvalue) == "pc_1_BIOMATERIAL_PROVIDER"] <- "PC1"
 rownames(total_pvalue)[rownames(total_pvalue) == "pc_2_BIOMATERIAL_PROVIDER"] <- "PC2"
 rownames(total_pvalue)[rownames(total_pvalue) == "pc_3_BIOMATERIAL_PROVIDER"] <- "PC3"
@@ -615,9 +602,10 @@ rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <-
 #transform dataframe into a matrix
 total_pvalue <- data.matrix(total_pvalue)
 
-#heatmap testing
+#heatmap 
 
-#preparation for heatmap
+##preparation for heatmap
+###p values under 0.1 are significant. to make visualisation easier we set values above to 10 and values equal or below to 1. So we just have to find colours for 2 values.
 
 for (i in 1:ncol(total_pvalue)){
   for (j in 1:nrow(total_pvalue)){
@@ -631,23 +619,30 @@ for (i in 1:ncol(total_pvalue)){
 }
 
 
-#heatmap 
-
+##heatmap 
+library(gplots)
 heatmap.2(total_pvalue, main = "batch effect in our principal components", Colv = NA, Rowv = NA, dendrogram = "none", sepwidth = c(0.01, 0.01), sepcolor = "black", trace= "none", col = colorRampPalette(c("salmon","blue")), breaks = c(seq(0, 1, length = 2),seq(1.1, 10, length = 2)),colsep = 1:ncol(total_pvalue), rowsep = 1:nrow(total_pvalue), key=FALSE)
+##Principal component 1 has a batch effect which you can see looking at the significant p values or at the heatmap
+##Therefor we go on with our analysis using Principal component 2 which does't show a batch effect at all.
 
-
-       
-#create a dataframe with loading scores of the 2000 most importat genes for principal component 2 
-
+#create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
 loading_scores <- pca_M$rotation[,2]
 gene_scores <- abs(loading_scores) 
 ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
-genes_top_2000 <- names(ranked_gene_score[1:2000])
+genes_top_10000 <- names(ranked_gene_score[1:10000])
 
+#showing the most important 10000 genes in PC2 in ranked order with loading scores with pos and neg sign
+pca_M$rotation[genes_top_10000,2]
+View(pca_M$rotation[genes_top_10000,2])
 
-#build a dataframe containing all M-values from the 2000 most important genes for principal component 2 
-k_means_data <- M_genes[genes_top_2000,]
+#Look for elbow in top gene variance
+plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
 
+#Actually there is a kink in the ellbow plot of loading scores of the genes at round about 2000 genes. And k-means clustering already worked with 2000 genes. But using only 2000 genes later gives us only 3 significantly differentially methylated genes, which is not sufficient. 10000 gives us 31 genes, which is an amount we can work with. 
+
+#build a dataframe containing all M-values from the 10000 most important genes for principal component 2 
+#k_means_data2 <- M_genes[genes_top_2000,] machen wir nun kmeans clustering mit 2000 oder 10000 genen?
+k_means_data <- M_genes[genes_top_10000,]
 #clustering with k-means
 
 k <- kmeans(x = t(k_means_data), centers = 2, iter.max = 1000)
@@ -670,13 +665,72 @@ for(i in 1:nrow(k_means_data)){
   p_value[i] = t_test$p.value
 }
 
-#create a dataframe wich contains the p-values from t-test in rising order
-
+#create a dataframe wich contains the p-values from t-test 
 pvalues <- data.frame(p_value)
-pvalues <- sort(pvalues$p_value, decreasing = F)
-pvalues <- data.frame(pvalues)
 
-#this is just for our markdown where we have to show our clusters, we have to deleate it in our code after wie made the markdown
-View(beta_genes_healthy)
-cluster <- data.frame(k[["cluster"]])
-View(cluster)
+#to show them in rising order do this, but then the information about which gene it is gets lost
+#pvalues <- sort(pvalues$p_value, decreasing = F)
+#pvalues <- data.frame(pvalues)
+
+
+#Possible combination add p values to gene names 
+row_names <- row.names(k_means_data)
+p_combined <- pvalues
+rownames(p_combined) <- row_names
+
+#symbol with p values and ID (stimmt nicht, hier ist immer noch kein p value dabei)
+symbols <- data.frame(genes$symbol)
+row_names2 <- row.names(genes)
+rownames(symbols) <- row_names2
+
+#this is just for our markdown where we have to show our clusters, we have to delete it in our code after we made the markdown
+#View(beta_genes_healthy)
+#cluster <- data.frame(k[["cluster"]])
+#View(cluster)
+
+#correction of p values by using holm method
+#Now p values are not in right order anymore, but in an order of decreasing values
+#das müssen wir hier anders machen. jetzt sind schon wieder unsere gennamen weg und es ist auch nicht die richtige reihenfolge
+p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
+p_combined = sort(p_combined$p_adjusted, decreasing = F)
+p_holm <- data.frame(p_combined)
+
+#fold change calculation
+#log2 fold change (use normal and not log)
+#hat valentina etwas dazu gesagt, was hier passiert, wenn wir NAs kriegen? wegen log von negativen werten und so?
+k_means_data_log <- log2(k_means_data)
+control <- k_means_data[, 1:5]
+tumor <- k_means_data[, 6:10]
+control_mean <- apply(control, 1, mean)
+tumor_mean <- apply(tumor, 1, mean)
+fold = control_mean - tumor_mean
+
+#volcano plot (differenz der methylierung gesund und healthy (als foldchange) gegen logarythmischen p value (aber hier nicht den korrigierten, weil es sonst so scheisse aussieht mit den ganzen werten die durch die korrektur zu 1 gesetzt wurden?) )
+plot(fold, -log10(p_value), ylim = c(0,3))
+threshold_significant = 0.1
+threshold_fold = 1
+#biologically relevant
+filter_by_fold = abs(fold) >= threshold_fold
+#statistically relevant
+filter_by_pvalue = abs(p_value) <= threshold_significant
+filter_combined = filter_by_fold & filter_by_pvalue
+#upmethylated
+plot(fold, -log10(p_value))
+points (fold[filter_combined & fold < 0],
+        -log10(p_value[filter_combined & fold < 0]),
+        pch = 16, col = "red")
+#hypomethylated
+points (fold[filter_combined & fold > 0],
+        -log10(p_value[filter_combined & fold > 0]),
+        pch = 16, col = "blue")
+
+#logistic regression
+#data frame (column of health status must factor, levels(column))
+#glm logistic regression (multicollinearity)
+#predict (threshold = 0.5), IMPORTANT: type = "response".
+
+#model with cross validation
+#vale sends the code :)
+#same but with two dataframe
+
+
