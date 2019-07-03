@@ -196,7 +196,7 @@ pca_values3 <- data.frame(Sample=rownames(pca_M$x),
                           Y=pca_M$x[,3])
 
 ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
- geom_text(aes(colour = annotation$DISEASE)) +
+  geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
   theme_bw() +
@@ -275,7 +275,7 @@ ggplot_2 <- ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   theme_bw() +
   ggtitle("PC1&2 check for cell type/origin")
 
-#auf das alter testen wir die signifikanz des batch effektes später nicht, denn eigentlich ist alter kein batch effekt, sonden sorgt für Unterschiede, die biologisch bedingt sind.
+#auf das alter testen wir die signifikanz des batch effektes sp??ter nicht, denn eigentlich ist alter kein batch effekt, sonden sorgt f??r Unterschiede, die biologisch bedingt sind.
 ggplot_4 <- ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
@@ -299,128 +299,128 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 #PC1&3
 
 #ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
- # geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
- # xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
- # ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
- # theme_bw() +
+# geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+# xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+# ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+# theme_bw() +
 #  ggtitle("PC1&3 check for gender")
 
 
 #ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
- # geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&3 check for cell type/origin")
+# geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&3 check for cell type/origin")
 
 #ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
- # geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&3 check for age")
+# geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&3 check for age")
 
 #ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&3 check for biomaterial provider")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&3 check for biomaterial provider")
 
 
 #PC1&4
 
 #ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&4 check for gender")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&4 check for gender")
 
 #ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&4 check for cell type/origin")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&4 check for cell type/origin")
 
 #ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&4 check for age")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&4 check for age")
 
 #ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
-  #xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC1&4 check for biomaterial provider")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+#xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC1&4 check for biomaterial provider")
 
 
 #PC2&3
 
 #ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
-  #xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC2&3 check for gender")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+#xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC2&3 check for gender")
 
 
 #ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
-  #xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC2&3 check for cell type/origin")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+#xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC2&3 check for cell type/origin")
 
 #ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
-  #xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC2&3 check for age")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+#xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC2&3 check for age")
 
 #ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
-  #xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  #ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC2&3 check for biomaterial provider")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+#xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+#ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC2&3 check for biomaterial provider")
 
 
 #PC3&4
 
 #ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
-  #xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC3&4 check for gender")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+#xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC3&4 check for gender")
 
 
 #ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
-  #xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC3&4 check for cell type/origin")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+#xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC3&4 check for cell type/origin")
 
 #ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
-  #xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC3&4 check for age")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+#xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC3&4 check for age")
 
 #ggplot(data=pca_values34, aes(x=X, y=Y, label=Sample)) +
-  #geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
-  #xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  #ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  #theme_bw() +
-  #ggtitle("PC3&4 check for biomaterial provider")
+#geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+#xlab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
+#ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
+#theme_bw() +
+#ggtitle("PC3&4 check for biomaterial provider")
 
 
 
@@ -444,7 +444,7 @@ cor.perm <- function (x, y, nperm = 1000)
   #  r.per <- replicate (nperm, expr = cor (x = x, y = sample (y)))
   r.per <- sapply (1:nperm, FUN = function (i) cor (x = x, y = sample (y)))
   r.per <- c(r.per, r.obs)
- 
+  
   P.per <- sum (abs (r.per) >= abs (r.obs))/(nperm + 1) 
   return(list(r.obs = r.obs, P.par = P.par, P.per = P.per))
 }
@@ -661,7 +661,7 @@ rownames(symbols) <- row_names2
 #View(cluster)
 
 #correction of p values by using holm method
-#Nun haben wir p values, korrigierte p values und Gen IDs nebeneinander. Aber sobald wir die nach größe sortieren mit der sort Funktion, werden die Gen IDs gelöscht und man könnte die Werte nicht mher den Genen zuordnen, weil sie ja auch nicht mehr in der richtigen Reihenfolge sind.Hmm..
+#Nun haben wir p values, korrigierte p values und Gen IDs nebeneinander. Aber sobald wir die nach gr????e sortieren mit der sort Funktion, werden die Gen IDs gel??scht und man k??nnte die Werte nicht mher den Genen zuordnen, weil sie ja auch nicht mehr in der richtigen Reihenfolge sind.Hmm..
 p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
 #p_combined = sort(p_combined$p_adjusted, decreasing = F)
 p_holm <- data.frame(p_combined)
@@ -697,7 +697,23 @@ points (fold[filter_combined & fold > 0],
         pch = 16, col = "blue")
 
 #logistic regression
-#data frame (column of health status must factor, levels(column))
+##We create a dataframe, which contains M values and healthstatus of 7 random patients. Therefor the M value dataframe needs to be transformed first.
+
+data_log_regression <- k_means_data[,c(1,2,4,5,8,9,10)]
+data_log_regression <- t(data_log_regression)
+testingset <- k_means_data[,c(3,6,7)]
+
+
+healthstatus <- annotation$DISEASE
+healthstatus <- data.frame(healthstatus)
+healthstatus_regression <- healthstatus[c(1, 2, 4, 5, 8, 9, 10),]
+healthstatus_regression <- data.frame(healthstatus_regression)
+                                      
+
+trainingset <- cbind(healthstatus_regression, data_log_regression)
+regression_model <- glm(healthstatus_regression ~ trainingset[,1], family = "binomial", data = log_regression)
+predict(regression_model, type = "response")
+
 #glm logistic regression (multicollinearity)
 #predict (threshold = 0.5), IMPORTANT: type = "response".
 
