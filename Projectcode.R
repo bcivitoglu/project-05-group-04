@@ -669,10 +669,10 @@ p_holm <- data.frame(p_combined)
 
 #fold change calculation
 #log2 fold change (use normal and not log)
-#hat valentina etwas dazu gesagt, was hier passiert, wenn wir NAs kriegen? wegen log von negativen werten und so?
+#Da wir negative Werte haben in den M values, nutzen wir nicht den log2, obwohl man das normalerweise bei einem foldchange macht.
 k_means_data_log <- log2(k_means_data)
-control <- k_means_data_log[, 1:5]
-tumor <- k_means_data_log[, 6:10]
+control <- k_means_data[, 1:5]
+tumor <- k_means_data[, 6:10]
 control_mean <- apply(control, 1, mean)
 tumor_mean <- apply(tumor, 1, mean)
 fold = control_mean - tumor_mean
