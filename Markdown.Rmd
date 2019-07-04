@@ -279,24 +279,445 @@ In the plot we can not see an elbow so we have to work with 10 principal compone
 
 
 #####Drawing a 2D plot of component 1 and 2
+To check whether we have a batch effect, we plot principal component 1 against principle component 2. 
 
 ```{r}
 library(ggplot2)
+
 pca_values <- data.frame(Sample=rownames(pca_M$x),
                        X=pca_M$x[,1],
                        Y=pca_M$x[,2])
 View(pca_values)
 ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
-  geom_text() +
+  geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
-  ggtitle("PCA Graph")
+  ggtitle("PCA Graph of principal component 1 and 2")
 ```
+
+pca_values2 <- data.frame(Sample=rownames(pca_M$x),
+                          X=pca_M$x[,1],
+                          Y=pca_M$x[,2])
+                          
+View(pca_values)
+ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
+  geom_text(aes(colour = annotation$DISEASE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("")
+
+
+#####Investigation for batch effect 
+Now we use different categories of the annotation table which possibly might cause batch effect and divide them by colour and shape in our graph of principal component 1 and 2.
+
+```{r}
+ggplot_1 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PC1&2 check for gender")
+
+
+ggplot_2 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PC1&2 check for cell type/origin")
+
+#auf das alter testen wir die signifikanz des batch effektes später nicht, denn eigentlich ist alter kein batch effekt, sonden sorgt für Unterschiede, die biologisch bedingt sind.
+ggplot_4 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PC1&2 check for age")
+
+ggplot_3 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
+  geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
+  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
+  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
+  theme_bw() +
+  ggtitle("PC1&2 check for biomaterial provider")
+```
+
+install.packages("gridExtra")
+```{r}
+library(gridExtra)
+library(ggplot2)
+grid.arrange(ggplot_1,ggplot_2, ncol=2)
+grid.arrange(ggplot_3,ggplot_4, ncol=2)
+```
+
+#####Checking our PC 1 to 5 for significant batch effect per category 
+To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the category of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
+For numbers we use the permutation test (of Pearson's r correlation coefficient), for 2 categories the Wilcoxon test and for more than 2 different categories the Kruskal-Wallis test.
+
+```{r}
+x <- pca_M[["x"]]
+pca1_5 <- x[,1:5]
+batch_kruskal <- data.frame(pca1_5, annotation$SAMPLE_DESC_3)
+batch_wilcoxon <- data.frame(pca1_5, annotation$BIOMATERIAL_PROVIDER, annotation$DISEASE, annotation$Predicted.Gender)
+batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
+```
+
+#####Permutation test for numbers
+Explanation of permutation test
+
+```{r}
+cor.perm <- function (x, y, nperm = 1000)
+{
+  r.obs <- cor (x = x, y = y)
+  P.par <- cor.test (x = x, y = y)$p.value
+  #  r.per <- replicate (nperm, expr = cor (x = x, y = sample (y)))
+  r.per <- sapply (1:nperm, FUN = function (i) cor (x = x, y = sample (y)))
+  r.per <- c(r.per, r.obs)
+ 
+  P.per <- sum (abs (r.per) >= abs (r.obs))/(nperm + 1) 
+  return(list(r.obs = r.obs, P.par = P.par, P.per = P.per))
+}
+
+x <-batch_permutation$PC1
+y <-batch_permutation$annotation.SEQ_RUNS_COUNT
+
+p_PC1_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC2
+p_PC2_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC3
+p_PC3_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC4
+p_PC4_SEQ <- cor.perm(x,y)
+
+x <-batch_permutation$PC5
+p_PC5_SEQ <- cor.perm(x,y)
+
+p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per, p_PC4_SEQ$P.per, p_PC5_SEQ$P.per)
+```
+
+#####Wilcoxon test for 2 categories
+Explanation of Wilcoxon test
+
+```{r}
+pc_1_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_2_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_3_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_4_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+pc_5_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
+
+pc_1_BIOMATERIAL_PROVIDER <- pc_1_BIOMATERIAL_PROVIDER$p.value
+pc_2_BIOMATERIAL_PROVIDER <- pc_2_BIOMATERIAL_PROVIDER$p.value
+pc_3_BIOMATERIAL_PROVIDER <- pc_3_BIOMATERIAL_PROVIDER$p.value
+pc_4_BIOMATERIAL_PROVIDER <- pc_4_BIOMATERIAL_PROVIDER$p.value
+pc_5_BIOMATERIAL_PROVIDER <- pc_5_BIOMATERIAL_PROVIDER$p.value
+
+pc_1_DISEASE <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_2_DISEASE <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_3_DISEASE <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_4_DISEASE <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+pc_5_DISEASE <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
+
+pc_1_DISEASE <- pc_1_DISEASE$p.value
+pc_2_DISEASE <- pc_2_DISEASE$p.value
+pc_3_DISEASE <- pc_3_DISEASE$p.value
+pc_4_DISEASE <- pc_4_DISEASE$p.value
+pc_5_DISEASE <- pc_5_DISEASE$p.value
+
+pc_1_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_2_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_3_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_4_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+pc_5_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
+
+pc_1_Predicted.Gender <- pc_1_Predicted.Gender$p.value
+pc_2_Predicted.Gender <- pc_2_Predicted.Gender$p.value
+pc_3_Predicted.Gender <- pc_3_Predicted.Gender$p.value
+pc_4_Predicted.Gender <- pc_4_Predicted.Gender$p.value
+pc_5_Predicted.Gender <- pc_5_Predicted.Gender$p.value
+
+p_DISEASE <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL_PROVIDER, pc_3_BIOMATERIAL_PROVIDER, pc_4_BIOMATERIAL_PROVIDER, pc_5_BIOMATERIAL_PROVIDER)
+p_BIOMATERIAL_PROVIDER <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL_PROVIDER, pc_3_BIOMATERIAL_PROVIDER, pc_4_BIOMATERIAL_PROVIDER, pc_5_BIOMATERIAL_PROVIDER)
+p_Predicted.Gender <- data.frame(pc_1_Predicted.Gender, pc_2_Predicted.Gender, pc_3_Predicted.Gender, pc_4_Predicted.Gender, pc_5_Predicted.Gender)
+```
+
+#####Kruskal-Wallis for several categories
+Explanation of Kruskal-Wallis test
+
+```{r}
+batch_kruskal <- within(batch_kruskal, {
+  PC1 <- as.numeric(as.character(PC1))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC2 <- as.numeric(as.character(PC2))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC3 <- as.numeric(as.character(PC3))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC4 <- as.numeric(as.character(PC4))
+})
+
+batch_kruskal <- within(batch_kruskal, {
+  PC5 <- as.numeric(as.character(PC5))
+})
+
+sample_desc_3_pc1 <- kruskal.test(batch_kruskal$PC1 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc2 <- kruskal.test(batch_kruskal$PC2 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc3 <- kruskal.test(batch_kruskal$PC3 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc4 <- kruskal.test(batch_kruskal$PC4 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+sample_desc_3_pc5 <- kruskal.test(batch_kruskal$PC5 ~ batch_kruskal$annotation.SAMPLE_DESC_3, data = batch_kruskal)
+
+p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.value, sample_desc_3_pc3$p.value, sample_desc_3_pc4$p.value, sample_desc_3_pc5$p.value)
+```
+
+
+We create a data frame containing all p values of the categories we investigate for a batch effect
+
+```{r}
+p_DISEASE_t <- as.data.frame(t(p_DISEASE))
+p_BIOMATERIAL_PROVIDER_t <- as.data.frame(t(p_BIOMATERIAL_PROVIDER))
+p_Predicted.Gender_t <- as.data.frame(t(p_Predicted.Gender))
+p_SEQ_RUNS_COUNT_t <- as.data.frame(t(p_SEQ_RUNS_COUNT))
+p_SAMPLE_DESC_3_t <- as.data.frame(t( p_SAMPLE_DESC_3))
+
+total_pvalue <- cbind(p_DISEASE_t,p_BIOMATERIAL_PROVIDER_t,p_Predicted.Gender_t,p_SEQ_RUNS_COUNT_t,p_SAMPLE_DESC_3_t)
+```
+
+
+We rename columns and rows.
+
+```{r}
+names(total_pvalue)[1] <- "p_DISEASE"
+names(total_pvalue)[2] <- "p_BIOMATERIAL"
+names(total_pvalue)[3] <- "p_GENDER"
+names(total_pvalue)[4] <- "p_SEQ_RUNS_COUNT"
+names(total_pvalue)[5] <- "p_SAMPLE_DESC"
+
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_1_BIOMATERIAL_PROVIDER"] <- "PC1"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_2_BIOMATERIAL_PROVIDER"] <- "PC2"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_3_BIOMATERIAL_PROVIDER"] <- "PC3"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_4_BIOMATERIAL_PROVIDER"] <- "PC4"
+rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <- "PC5"
+```
+
+transform dataframe into a matrix
+```{r}
+total_pvalue <- data.matrix(total_pvalue)
+```
+
+preparation for heatmap 
+
+P-values under 0.1 are significant. To make visualisation easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
+
+```{r}
+for (i in 1:ncol(total_pvalue)){
+  for (j in 1:nrow(total_pvalue)){
+    if(isTRUE(total_pvalue[i,j] > 0.1)){
+      total_pvalue[i,j] <- 10
+    }
+    if (isTRUE(total_pvalue[i,j] <= 0.1)){
+      total_pvalue [i,j] <- 1
+    }
+  }
+}
+```
+
+#####heatmap 
+
+To **decide which pca we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
+```{r}
+library(gplots)
+heatmap.2(
+  total_pvalue, main = "batch effect in our principal components", 
+  Colv = NA, 
+  Rowv = NA, 
+  dendrogram = "none", 
+  sepwidth = c(0.01, 0.01), 
+  sepcolor = "black", 
+  trace= "none", 
+  col = colorRampPalette(c("salmon","blue")), 
+  breaks = c(seq(0, 1, length = 2),
+  seq(1.1, 10, length = 2)),
+  colsep = 1:ncol(total_pvalue), 
+  rowsep = 1:nrow(total_pvalue), 
+  key=FALSE)
+```
+
+Principal component 1 has a batch effect which you can see looking at the significant p values or at the heatmap
+Therefor we go on with our analysis using Principal component 2 which doesn't show a batch effect at all.
+
+#####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
+
+Now we want to **find the most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values.
+
+```{r}
+loading_scores <- pca_M$rotation[,2]
+gene_scores <- abs(loading_scores) 
+ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
+genes_top_10000 <- names(ranked_gene_score[1:10000])
+```
+
+showing the most important 10000 genes in PC2 in ranked order with loading scores with positive and negative sign
+```{r}
+View(pca_M$rotation[genes_top_10000,2])
+```
+
+#####Look for elbow in top gene variance
+Now we want to decide how many genes we want to keep for our further analysis by looking for an elbow in the plot of loading scores. 
+```{r}
+plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
+```
+
+Actually there is a kink in the ellbow plot of loading scores of the genes at round about 2000 genes. And k-means clustering already worked with 2000 genes. But using only 2000 genes later gives us only 3 significantly differentially methylated genes, which is not sufficient. 10000 gives us 31 genes, which is an amount we can work with. 
+
+We create a dataframe containing all M-values from the 10000 most important genes for principal component 2.
+#k_means_data2 <- M_genes[genes_top_2000,] machen wir nun kmeans clustering mit 2000 oder 10000 genen?
+```{r}
+k_means_data <- M_genes[genes_top_10000,]
+```
+
+
+###Clustering with k-means
+By performing k-means clustering we want to see whether sick and healthy patients are separated in two different clusters????
+```{r}
+k <- kmeans(x = t(k_means_data), centers = 2, iter.max = 1000)
+k <-
+  kmeans(
+    x = t(k_means_data),
+    centers = 2,
+    iter.max = 1000
+  )
+View(k)
+```
+
+###t-test (students t-test)
+
+
+```{r}
+cluster <- k[["cluster"]]
+p_value = NULL
+for(i in 1:nrow(k_means_data)){
+  x = k_means_data[i, 1:5]
+  y = k_means_data[i, 6:10]
+  t_test = t.test(x, y)
+  p_value[i] = t_test$p.value
+}
+```
+
+create a dataframe wich contains the p-values from t-test 
+
+```{r}
+pvalues <- data.frame(p_value)
+```
+
+to show them in rising order do this, but then the information about which gene it is gets lost
+pvalues <- sort(pvalues$p_value, decreasing = F)
+pvalues <- data.frame(pvalues)
+
+
+Possible combination add p values to gene names 
+
+```{r}
+row_names <- row.names(k_means_data)
+p_combined <- pvalues
+rownames(p_combined) <- row_names
+```
+
+symbol with p values and ID (stimmt nicht, hier ist immer noch kein p value dabei)
+
+```{r}
+symbols <- data.frame(genes$symbol)
+row_names2 <- row.names(genes)
+rownames(symbols) <- row_names2
+```
+
+this is just for our markdown where we have to show our clusters, we have to delete it in our code after we made the markdown
+View(beta_genes_healthy)
+cluster <- data.frame(k[["cluster"]])
+View(cluster)
+
+correction of p values by using holm method
+Nun haben wir p values, korrigierte p values und Gen IDs nebeneinander. Aber sobald wir die nach größe sortieren mit der sort Funktion, werden die Gen IDs gelöscht und man könnte die Werte nicht mher den Genen zuordnen, weil sie ja auch nicht mehr in der richtigen Reihenfolge sind.Hmm..
+
+```{r}
+p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
+```
+
+p_combined = sort(p_combined$p_adjusted, decreasing = F)
+
+
+```{r}
+p_holm <- data.frame(p_combined)
+```
+
+fold change calculation
+log2 fold change (use normal and not log)
+Da wir negative Werte haben in den M values, nutzen wir nicht den log2, obwohl man das normalerweise bei einem foldchange macht.
+
+```{r}
+k_means_data_log <- log2(k_means_data)
+control <- k_means_data[, 1:5]
+tumor <- k_means_data[, 6:10]
+control_mean <- apply(control, 1, mean)
+tumor_mean <- apply(tumor, 1, mean)
+fold = control_mean - tumor_mean
+```
+
+volcano plot (differenz der methylierung gesund und healthy (als foldchange) gegen logarythmischen p value (aber hier nicht den korrigierten, weil es sonst so scheisse aussieht mit den ganzen werten die durch die korrektur zu 1 gesetzt wurden?) )
+
+
+```{r}
+plot(fold, -log10(p_value), ylim = c(0,3))
+threshold_significant = 0.1
+threshold_fold = 1
+```
+
+#####biologically relevant
+
+```{r}
+filter_by_fold = abs(fold) >= threshold_fold
+```
+
+#####statistically relevant
+
+```{r}
+filter_by_pvalue = abs(p_value) <= threshold_significant
+filter_combined = filter_by_fold & filter_by_pvalue
+```
+
+#####upmethylated
+```{r}
+plot(fold, -log10(p_value))
+points (fold[filter_combined & fold < 0],
+        -log10(p_value[filter_combined & fold < 0]),
+        pch = 16, col = "red")
+```
+        
+#####hypomethylated
+
+```{r}
+points (fold[filter_combined & fold > 0],
+        -log10(p_value[filter_combined & fold > 0]),
+        pch = 16, col = "blue")
+```
+
+
+
+
+
+
 
 #####Looking at the loading scores for the first principal component
 
-Now we want to **find the 30 most important genes** which means that we want to find the genes which have the most influence on the principal component one. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values.
+Now we want to **find the 30 most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values.
 
 ```{r}
 loading_scores <- pca_M$rotation[,1]
