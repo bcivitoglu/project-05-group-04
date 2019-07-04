@@ -610,17 +610,17 @@ View(pca_M$rotation[genes_top_10000,2])
 #Look for elbow in top gene variance
 plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
 
-#Actually there is a kink in the ellbow plot of loading scores of the genes at round about 2000 genes. And k-means clustering already worked with 2000 genes. But using only 2000 genes later gives us only 3 significantly differentially methylated genes, which is not sufficient. 10000 gives us 31 genes, which is an amount we can work with. 
+#Actually there is a kink in the ellbow plot of loading scores of the genes at round about 2000 genes. Therefor we do k-means clustering with 2000 genes.But using only 2000 genes later gives us only 3 significantly differentially methylated genes, which is not sufficient. 10000 gives us 31 genes, which is an amount we can work with. 
 
-#build a dataframe containing all M-values from the 10000 most important genes for principal component 2 
-#k_means_data2 <- M_genes[genes_top_2000,] machen wir nun kmeans clustering mit 2000 oder 10000 genen?
+#build a dataframe containing all M-values from the 2000 and 10000 most important genes for principal component 2                
+k_means_data2 <- M_genes[genes_top_2000,]
 k_means_data <- M_genes[genes_top_10000,]
-#clustering with k-means
-
-k <- kmeans(x = t(k_means_data), centers = 2, iter.max = 1000)
+                   
+#clustering the patient with k-means using a dataframe containing M values of the 2000 most important genes
+k <- kmeans(x = t(k_means_data2), centers = 2, iter.max = 1000)
 k <-
   kmeans(
-    x = t(k_means_data),
+    x = t(k_means_data2),
     centers = 2,
     iter.max = 1000
   )
@@ -699,8 +699,9 @@ points (fold[filter_combined & fold > 0],
 #logistic regression
 ##We create a dataframe, which contains M values and healthstatus of 7 random patients. Therefor the M value dataframe needs to be transformed first.
 
-data_log_regression <- k_means_data[,c(1,2,4,5,8,9,10)]
-data_log_regression <- t(data_log_regression)
+log_regression <- k_means_data[,c(1,2,4,5,8,9,10)]
+log_regression <- t(log_regression)
+log_regression <- data.frame(log_regression)
 testingset <- k_means_data[,c(3,6,7)]
 
 
@@ -710,10 +711,11 @@ healthstatus_regression <- healthstatus[c(1, 2, 4, 5, 8, 9, 10),]
 healthstatus_regression <- data.frame(healthstatus_regression)
                                       
 
-trainingset <- cbind(healthstatus_regression, data_log_regression)
+trainingset <- cbind(healthstatus_regression, log_regression)
 regression_model <- glm(healthstatus_regression ~ trainingset[,1], family = "binomial", data = log_regression)
 predict(regression_model, type = "response")
 
+                                      
 #glm logistic regression (multicollinearity)
 #predict (threshold = 0.5), IMPORTANT: type = "response".
 
