@@ -597,11 +597,12 @@ heatmap.2(total_pvalue, main = "batch effect in our principal components", Colv 
 ##Principal component 1 has a batch effect which you can see looking at the significant p values or at the heatmap
 ##Therefor we go on with our analysis using Principal component 2 which does't show a batch effect at all.
 
-#create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
+#create a dataframes with loading scores of the 2000 and 10000 most importat genes, which have the most influence for principal component 2.
 loading_scores <- pca_M$rotation[,2]
 gene_scores <- abs(loading_scores) 
 ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
 genes_top_10000 <- names(ranked_gene_score[1:10000])
+genes_top_2000 <- names(ranked_gene_score[1:2000])
 
 #showing the most important 10000 genes in PC2 in ranked order with loading scores with pos and neg sign
 pca_M$rotation[genes_top_10000,2]
