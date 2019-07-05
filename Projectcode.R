@@ -709,7 +709,6 @@ testingset <- k_means_data[,c(3,6,7)]
 healthstatus <- annotation$DISEASE
 healthstatus <- data.frame(healthstatus)
 healthstatus_regression <- healthstatus[c(1, 2, 4, 5, 8, 9, 10),]
-healthstatus_regression <- data.frame(healthstatus_regression)
                                       
 
 trainingset <- cbind(healthstatus_regression, log_regression)
