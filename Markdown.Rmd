@@ -514,9 +514,9 @@ total_pvalue <- data.matrix(total_pvalue)
 ```
 
 
-#####preparation for heatmap 
+#####Preparation for heatmap 
 
-To **decide which pca we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
+To **decide which PC we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
 For analyzing and comparing all p-values we state all p-values under 0.1 as significant. To make visualisation easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
 
 ```{r}
@@ -532,7 +532,7 @@ for (i in 1:ncol(total_pvalue)){
 }
 ```
 
-#####heatmap 
+#####Heatmap 
 
 ```{r}
 library(gplots)
@@ -589,7 +589,7 @@ k_means_data <- M_genes[genes_top_10000,]
 
 ###Clustering with k-means
 
-K-means is a method to find groups in the data. It uses an iterative Algorithm which means that there is a repitition of steps with the aim of finding the right cluster for each datapoint. First step is the clustering which means that the datapoints get splitted up into k clusters. Each datapoint get allot the its next clusterpoint. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as one set in the code. By performing k-means clustering we want to **ckeck whether sick and healthy patients are separated in two different clusters.**
+K-means is a method to find groups in the data. It uses an iterative Algorithm which means that there is a repitition of steps with the aim of finding the right cluster for each datapoint. First step is the clustering which means that the datapoints get split up into k clusters. Each datapoint gets allot the its next clusterpoint. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as one set in the code. By performing k-means clustering we want to **ckeck whether sick and healthy patients are separated in two different clusters.**
 
 ```{r}
 k <- kmeans(x = t(k_means_data), centers = 2, iter.max = 1000)
@@ -609,11 +609,13 @@ cluster <- data.frame(k[["cluster"]])
 View(cluster)
 ```
 
-One can see that our sick and healthy patients belong to two different clusters so we can use pricipal component two for further testing.
+One can see that our sick and healthy patients belong to two different clusters so we can use principal component two for further testing.
 
+### Identifying differetially methylated regions (DMRs)
 
-###t-test (students t-test)
+####Student's t-test
 
+To see whether the methylation differences, so differences in M-values, between the two Sample groups are significant, **a student t-test is performed**. It can be used, because due to normalisation the varaiance of the values are equal now. The test compares the mean M-value of sick patients to the mean M-value of healthy patients and gives a p-value, which is significant or not depending on how strict is the threshold you set.
 
 ```{r}
 cluster <- k[["cluster"]]
@@ -626,18 +628,19 @@ for(i in 1:nrow(k_means_data)){
 }
 ```
 
-create a dataframe wich contains the p-values from t-test 
+We **create a dataframe wich contains the p-values** from t-test.
 
 ```{r}
 pvalues <- data.frame(p_value)
 ```
 
-to show them in rising order do this, but then the information about which gene it is gets lost
+To show them in rising order, this code can be used. This is interesting to get an impression, how many genes are significantly varying in methylation, but doing this changes the order of genes, so the information about which gene it is gets lost. Therefor we won't go on with this increasing order
+
 pvalues <- sort(pvalues$p_value, decreasing = F)
 pvalues <- data.frame(pvalues)
 
 
-Possible combination add p values to gene names 
+To get the gene ID belonging to those p-values we **change the rownames**.
 
 ```{r}
 row_names <- row.names(k_means_data)
@@ -645,36 +648,24 @@ p_combined <- pvalues
 rownames(p_combined) <- row_names
 ```
 
-symbol with p values and ID (stimmt nicht, hier ist immer noch kein p value dabei)
+####Correction of p values by using the holm method
 
-```{r}
-symbols <- data.frame(genes$symbol)
-row_names2 <- row.names(genes)
-rownames(symbols) <- row_names2
-```
-
-this is just for our markdown where we have to show our clusters, we have to delete it in our code after we made the markdown
-View(beta_genes_healthy)
-cluster <- data.frame(k[["cluster"]])
-View(cluster)
-
-correction of p values by using holm method
-Nun haben wir p values, korrigierte p values und Gen IDs nebeneinander. Aber sobald wir die nach größe sortieren mit der sort Funktion, werden die Gen IDs gelöscht und man könnte die Werte nicht mher den Genen zuordnen, weil sie ja auch nicht mehr in der richtigen Reihenfolge sind.Hmm..
+To reduce the family-wise error rate, which is the propability of getting one ore more type 1 errors (also called false positive error), the *holm method* is used. Besides a *dataframe* containing the uncorrected p-values, the corrected p-values and the belonging gene ID is created.
 
 ```{r}
 p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
-```
-
-p_combined = sort(p_combined$p_adjusted, decreasing = F)
-
-
-```{r}
 p_holm <- data.frame(p_combined)
 ```
 
-fold change calculation
-log2 fold change (use normal and not log)
-Da wir negative Werte haben in den M values, nutzen wir nicht den log2, obwohl man das normalerweise bei einem foldchange macht.
+Only 31 genes are significantly differently methylated,
+####Statistical and biological relevant methylation differences in genes
+
+A vulcano plot can help visualising whether a gene is claimed to be differently methylated in healthy and sick patients because of statistical reasons, which means a significant p-value or because of biological reasons, which would be a big difference in the mean of the M-values. Only the genes which show both characteristics, really have a significant methylation difference.
+
+#####Fold change calculation
+
+On the x-axis of the volcano plot there is the **difference of the M-Value means of each sample group**. This is the axis showing the biological relevance. Usually for better visualization you use the log2 fold change. Due to the negative M-values that exist, this is mathematically not possible, which you see running the first code. Therefor we dont use the log2 fold change, but only the mean-difference.
+
 
 ```{r}
 k_means_data_log <- log2(k_means_data)
@@ -685,43 +676,42 @@ tumor_mean <- apply(tumor, 1, mean)
 fold = control_mean - tumor_mean
 ```
 
-volcano plot (differenz der methylierung gesund und healthy (als foldchange) gegen logarythmischen p value (aber hier nicht den korrigierten, weil es sonst so scheisse aussieht mit den ganzen werten die durch die korrektur zu 1 gesetzt wurden?) )
+#####Visualisation
 
+Also on the y-axis we have to improvise: The y-axis shows the p-values and therefor the statistical relevance. Actually the corrected p-values should be used, but somehow a lot of p-values were corrected to the value 1, which distorts the plot. Therefor we use the uncorrected p-values for the y-axis and **create a volcano plot**
 
 ```{r}
 plot(fold, -log10(p_value), ylim = c(0,3))
+```
+
+To visualise genes that are statistically and biologically relevant and subdivide them into upmethylated and hypomethylated genes in case of cancer, we first **create thresholds for significance** in p-values and M-value-difference (fold).
+
+```{r}
 threshold_significant = 0.1
 threshold_fold = 1
 ```
 
-#####biologically relevant
+We create a **filter for biological relevant genes** using the threshold for M-value-difference, one for **statistically relevant genes** and one that **combines both in one filter**.
 
 ```{r}
 filter_by_fold = abs(fold) >= threshold_fold
-```
-
-#####statistically relevant
-
-```{r}
 filter_by_pvalue = abs(p_value) <= threshold_significant
 filter_combined = filter_by_fold & filter_by_pvalue
 ```
 
-#####upmethylated
+The genes which fit this filter and are **upmethylated** in cancer cells are coloured in red, while the **hypomethylated** genes are coloured in blue.
+
 ```{r}
 plot(fold, -log10(p_value))
 points (fold[filter_combined & fold < 0],
         -log10(p_value[filter_combined & fold < 0]),
         pch = 16, col = "red")
-```
-        
-#####hypomethylated
 
-```{r}
 points (fold[filter_combined & fold > 0],
         -log10(p_value[filter_combined & fold > 0]),
         pch = 16, col = "blue")
 ```
+
 
 
 
