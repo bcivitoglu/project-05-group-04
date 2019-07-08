@@ -313,6 +313,8 @@ ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
 
 ####Investigation for batch effect 
 Now we use different categories of the annotation table which possibly might cause batch effect and divide them by colour and shape in our graph of principal component 1 and 2.
+Batch effect is a technical source of error, which could have been added to the samples by e.g. gender. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
+To avoid errors, we used three tests to see whether there is a batch effect in a principal component or not.
 
 ```{r}
 ggplot_1 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
@@ -356,7 +358,7 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 
 #####Checking our PC 1 to 5 for significant batch effect per category 
 To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the category of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
-For numbers we use the permutation test (of Pearson's r correlation coefficient), for 2 categories the Wilcoxon test and for more than 2 different categories the Kruskal-Wallis test.
+For numbers we use the permutation test (of Pearson's r correlation coefficient), for two categories the Wilcoxon test and for more than two different categories the Kruskal-Wallis test.
 
 ```{r}
 x <- pca_M[["x"]]
@@ -367,7 +369,8 @@ batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 ```
 
 #####Permutation test for numbers
-Explanation of permutation test
+
+The permutation test is a non-parametric test to check, whether two not connected spot checks (Stichprobe?) derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit.The permutation test in the usual form is tailored to the counterhypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
 
 ```{r}
 cor.perm <- function (x, y, nperm = 1000)
@@ -404,6 +407,11 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 
 #####Wilcoxon test for 2 categories
 Explanation of Wilcoxon test
+The Wilcoxon test for dependent spot checks tests, whether the central tendencies are different. "Dependent spot checks" is used when one measurement in a sample and one measurement in another sample influence each other. In three situations this is the case:
+1) Repeated measures
+2) Natural pairs
+3) Matching
+Basically it is possible to check for a batch effect with two categories only.
 
 ```{r}
 pc_1_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
