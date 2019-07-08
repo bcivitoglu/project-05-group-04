@@ -20,11 +20,13 @@ The analysis will be done in several steps:
   * Quality control of M-values
 3. **Data reduction**
   * Dimensionality reduction via PCA
-  * Featuere selection
+  * Batch effect analysis
 4. **Clustering**
   * Via K-means clustering
    
 5. **Identifying DMRs**
+  *t-test and p-value correction
+  *testing for hypo- and hypermethylation
 6. **logistic regression**
 7. **Data interpretation**
 
@@ -252,12 +254,12 @@ For applying the PCA on our data we have to build a dataset which contains sick 
 M_genes <- cbind(M_genes_healthy, M_genes_cancer)
 ```
 
-###PCA
+###Dimensionality reduction
 
 To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller set which still contains most information of the large dataset. Through the PCA, correlated variables get transformed into a much smaller number of uncorrelated variables which are called principal components.
 We want to have less variables, because it is easier to work with them. 
 
-#####Code for the PCA
+####PCA
 
 The code for the **PCA** expects the patients to be rows and the samples to be columns. In our data the patients are columns and the genes are rows so we have to **transpose the matrix** with the t() function. 
 
@@ -309,7 +311,7 @@ ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   ggtitle("")
 
 
-#####Investigation for batch effect 
+####Investigation for batch effect 
 Now we use different categories of the annotation table which possibly might cause batch effect and divide them by colour and shape in our graph of principal component 1 and 2.
 
 ```{r}
