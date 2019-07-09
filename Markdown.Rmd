@@ -58,6 +58,30 @@ tiling <- input_data$tiling
 ```{r}
 grep("symbol", genes$symbol, value = TRUE)
 ```
+**Matching genes** from the literature and our dataset are the following:
+
+TWIST2
+VHL
+ABI3
+ADORA3
+PRF1
+CLLU1
+LPL
+NOTCH1
+SCARF1
+TNF
+CTBP2
+EGR1
+
+The following genes from the literature can be found in our dataset heaped, as they probably belong to a family:
+
+NFAT
+EBF
+ODC
+
+
+
+
 Those subgroups datasets contain methylation data for different regions on the genome:
 `genes`, `promoters` and `cpgislands`contain genome segments with specific functions and methylation features. Genes, especially highly expressed genes, sometimes show methylation in their gene body. Unfortunately the biological function behind this is not fully clear yet. Still it can be interesting investigating in their methylation pattern in terms of cancer. In promoters  we already know that methylation plays an important role, because as promoters are the starting point for transcription, their methylation can silence genes laying downstream of these promoters. This way for example tumor suppresor genes don't get expressed any more, which can lead to cancer. Here we expect to find crucial differences in methylation between sick and healthy cells. CpG islands also are important regions on the DNA with a high density of cytosines in neighbourhood to guanines. These CpG islands are often in promoter regions of housekeeping genes and in healthy beeings only rarely methylated, because their methylation usually leads to mistakes in replication and transcription and quickly in death just because functioning promoters are so essential in those genes. Also in those CpG islands a loss of function can lead to cancer, so we expect significant methylation differences. The fourth subgroup is `tiling` which describes a specific section on the genome in steps of 5000 nucleotides without a biological context.
 
@@ -312,8 +336,8 @@ ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
 
 
 ####Investigation for batch effect 
-Now we use different categories of the annotation table which possibly might cause batch effect and divide them by colour and shape in our graph of principal component 1 and 2.
-Batch effect is a technical source of error, which could have been added to the samples by e.g. gender. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
+Now we use different categories of the annotation table which possibly might cause **batch effect** and divide them by colour and shape in our graph of principal component 1 and 2.
+Batch effect is a **technical source of error**, which could have been added to the samples by e.g. gender. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
 To avoid errors, we used three tests to see whether there is a batch effect in a principal component or not.
 
 ```{r}
@@ -357,8 +381,9 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 ```
 
 #####Checking our PC 1 to 5 for significant batch effect per category 
+
 To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the category of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
-For numbers we use the permutation test (of Pearson's r correlation coefficient), for two categories the Wilcoxon test and for more than two different categories the Kruskal-Wallis test.
+For numbers we use the **permutation test** (of Pearson's r correlation coefficient), for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
 
 ```{r}
 x <- pca_M[["x"]]
@@ -370,7 +395,7 @@ batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 
 #####Permutation test for numbers
 
-The permutation test is a non-parametric test to check, whether two not connected spot checks (Stichprobe?) derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit.The permutation test in the usual form is tailored to the counterhypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
+The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counterhypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
 
 ```{r}
 cor.perm <- function (x, y, nperm = 1000)
@@ -406,8 +431,8 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 ```
 
 #####Wilcoxon test for 2 categories
-Explanation of Wilcoxon test
-The Wilcoxon test for dependent spot checks tests, whether the central tendencies are different. "Dependent spot checks" is used when one measurement in a sample and one measurement in another sample influence each other. In three situations this is the case:
+
+The **Wilcoxon test** for dependent spot checks tests, whether the central tendencies are different. "Dependent spot checks" is used if one measurement in a sample and one measurement in another sample influence each other. In three situations this is the case:
 1) Repeated measures
 2) Natural pairs
 3) Matching
@@ -456,7 +481,9 @@ p_Predicted.Gender <- data.frame(pc_1_Predicted.Gender, pc_2_Predicted.Gender, p
 ```
 
 #####Kruskal-Wallis for several categories
-Explanation of Kruskal-Wallis test
+
+The **Kurskal-Wallis test** checks, whether there is a difference in central tendencies between several independent spot checks. The test is used, if the prerequisites for a parametric method is not fulfilled. One of the benefits of the test is that the data does not have to be normally distributed. On the other hand, the test can also be calculated for small samples and outliers.
+Basically it is possible to check for a batch effect with several categories.
 
 ```{r}
 batch_kruskal <- within(batch_kruskal, {
@@ -518,7 +545,7 @@ rownames(total_pvalue)[rownames(total_pvalue) == "pc_4_BIOMATERIAL_PROVIDER"] <-
 rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <- "PC5"
 ```
 
-transform dataframe into a matrix
+Transform dataframe into a matrix
 ```{r}
 total_pvalue <- data.matrix(total_pvalue)
 ```
