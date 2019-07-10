@@ -1,6 +1,6 @@
 ---
 title: "Cancer methylome analysis CLL vs. B-Cells"
-author: "Leona Brandl, Carlotta BrÃ¼ggen, Tim KÃ¼hn, Violetta Schaaf"
+author: "Leona Brandl, Carlotta Br????ggen, Tim K????hn, Violetta Schaaf"
 date: "8th July 2019"
 output: html_document
 ---
@@ -29,7 +29,6 @@ The analysis will be done in several steps:
   * Batch effect analysis
 4. **Clustering**
   * Via K-means clustering
-   
 5. **Identifying DMRs**
   *t-test and p-value correction
   *testing for hypo- and hypermethylation
@@ -269,7 +268,7 @@ beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
 
 #####Transforming beta-values into M-values
 
-In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data. We calculate the M-values with the equation M-value = log2(beta-value/(1− beta-value)).
+In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data. We calculate the M-values with the equation M-value = log2(beta-value/(1??? beta-value)).
 
 ```{r}
 M_genes_healthy <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
@@ -328,19 +327,6 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   ggtitle("PCA Graph of principal component 1 and 2")
 ```
 
-pca_values2 <- data.frame(Sample=rownames(pca_M$x),
-                          X=pca_M$x[,1],
-                          Y=pca_M$x[,2])
-                          
-View(pca_values)
-ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
-  geom_text(aes(colour = annotation$DISEASE)) +
-  xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
-  ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
-  ggtitle("")
-
-
 ####Investigation for batch effect 
 Now we use different categories of the annotation table which possibly might cause **batch effect** and divide them by colour and shape in our graph of principal component 1 and 2.
 Batch effect is a **technical source of error**, which could have been added to the samples by e.g. gender. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
@@ -354,7 +340,6 @@ ggplot_1 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   theme_bw() +
   ggtitle("PC1&2 check for gender")
 
-
 ggplot_2 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
@@ -362,7 +347,6 @@ ggplot_2 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   theme_bw() +
   ggtitle("PC1&2 check for cell type/origin")
 
-#auf das alter testen wir die signifikanz des batch effektes später nicht, denn eigentlich ist alter kein batch effekt, sonden sorgt für Unterschiede, die biologisch bedingt sind.
 ggplot_4 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
@@ -376,10 +360,7 @@ ggplot_3 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   theme_bw() +
   ggtitle("PC1&2 check for biomaterial provider")
-```
 
-install.packages("gridExtra")
-```{r}
 library(gridExtra)
 library(ggplot2)
 grid.arrange(ggplot_1,ggplot_2, ncol=2)
@@ -522,7 +503,7 @@ p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.val
 ```
 
 
-We create a data frame containing all p values of the categories we investigate for a batch effect
+We create a data frame containing all p values of the categories we investigate for a batch effect.
 
 ```{r}
 p_DISEASE_t <- as.data.frame(t(p_DISEASE))
@@ -607,10 +588,6 @@ loading_scores <- pca_M$rotation[,2]
 gene_scores <- abs(loading_scores) 
 ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
 genes_top_10000 <- names(ranked_gene_score[1:10000])
-```
-
-```{r}
-View(pca_M$rotation[genes_top_10000,2]) muss eventuell raus mein R spinnt nur spuckt wahrscheinlich lange sachen aus
 ```
 
 #####Look for elbow in top gene variance
@@ -762,20 +739,3 @@ points (fold[filter_combined & fold > 0],
 
 
 
-#####Looking at the loading scores for the first principal component
-
-Now we want to **find the 30 most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values.
-
-```{r}
-loading_scores <- pca_M$rotation[,1]
-gene_scores <- abs(loading_scores) 
-ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
-genes_top_30 <- names(ranked_gene_score[1:30])
-View(genes_top_30)
-```
-
-After that we want to see which genes have positive and which genes have negative loading scores.
-
-```{r}
-pca_M$rotation[genes_top_30,1]
-```
