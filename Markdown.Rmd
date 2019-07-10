@@ -6,7 +6,13 @@ output: html_document
 ---
 
 
-Text about what our project is about.
+The aim of this project is to find genes which differ in their methylation level for cancer cells derived from chronic lymphocytic leukemia (CLL) patients compared to B-cells derived from healthy patients. Therefore, we analyze methylation data of five CLL patients and five healthy patients, looking for differentially methylated regions which we then examine for statistical and biological significance in carcinogenesis and especially inspect genes which according to literature are connected to CLL pathogenesis.
+Chronic lymphocytic leukemia is the most common form of leukemia in adults and can be characterized? as the uncontrolled proliferation of B-lymphocytes. Since their ability to undergo apoptosis is inhibited, these functionally incompetent B-cells accumulate in the blood vessels and displace healthy blood cells. Consequences of this development are increased vulnerability for infections, a lower oxygen level in the blood and longer bleeding periods in case of injury. As CLL originates from B-cells, we use these for comparison in our analysis.
+It is proved that aberrant methylation has an effect on oncogenesis and there is evidence that this might also be the case for CLL. The most common form of methylation is the conversion of a cytosine to 5-methylcytosine by the addition of a methyl group in fifth position of the nucleobase by the DNA methyltransferase. Methylation is highly relevant in epigenetics since it has an effect on the transcription of genes and may lead to gene silencing
+In CLL, a global hypomethylation compared to healthy cells has been observed, with possible consequences being activation of gene expression as well as genomic instability
+Moreover, hypermethylation of gene promotors was frequently detected, which might lead to inhibition of promotor activity and affect the transcription of tumor suppressor genes.
+The methylation data we work with was obtained by bisulfite sequencing, which is a library strategy providing information on the degree of DNA methylation. In this technique DNA is treated with bisulfite upon amplification with PCR, resulting in the conversion of unmethylated cytosines into thymines while methylated cytosines are protected from modification. Afterwards, it is possible to calculate the beta value, which is defined as the ratio of methylated cytosines to the total number of cytosines in the genome, ranging between 0 and 1. 
+
 
 The analysis will be done in several steps:
 
