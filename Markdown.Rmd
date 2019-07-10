@@ -318,7 +318,6 @@ library(ggplot2)
 pca_values <- data.frame(Sample=rownames(pca_M$x),
                        X=pca_M$x[,1],
                        Y=pca_M$x[,2])
-View(pca_values)
 ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
@@ -619,14 +618,13 @@ k <-
     centers = 2,
     iter.max = 1000
   )
-View(k)
 ```
 
 
 ```{r}
-View(beta_genes_healthy)
+#print(beta_genes_healthy)
 cluster <- data.frame(k[["cluster"]])
-View(cluster)
+cluster
 ```
 
 One can see that our sick and healthy patients belong to two different clusters so we can use principal component two for further testing.

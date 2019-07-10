@@ -151,7 +151,7 @@ M_genes_cancer <- log2(beta_genes_cancer/(1-(beta_genes_cancer)))
 
 #dataset containing healthy and cancer M-values
 M_genes <- cbind(M_genes_healthy, M_genes_cancer)
-
+cat <- M_genes[1:10, 1:10]
 #Rename columns to shorter names
 
 colnames(M_genes) <- c("1H","2H","3H","4H","5H","6CLL","7CLL","8CLL","9CLL","10CLL")
@@ -618,7 +618,7 @@ k_means_data2 <- M_genes[genes_top_2000,]
 k_means_data <- M_genes[genes_top_10000,]
                    
 #clustering the patient with k-means using a dataframe containing M values of the 2000 most important genes
-k <- kmeans(x = t(k_means_data2), centers = 2, iter.max = 1000)
+k <- kmeans(x = t(k_means_data2), centers = 2)
 k <-
   kmeans(
     x = t(k_means_data2),
@@ -671,9 +671,10 @@ p_holm <- data.frame(p_combined)
 #fold change calculation
 #log2 fold change (use normal and not log)
 #Da wir negative Werte haben in den M values, nutzen wir nicht den log2, obwohl man das normalerweise bei einem foldchange macht.
-k_means_data_log <- log2(k_means_data)
-control <- k_means_data[, 1:5]
-tumor <- k_means_data[, 6:10]
+t_test_beta <- beta_genes_cleaned[genes_top_10000,]
+k_means_data_log <- log2(t_test_beta)
+control <- k_means_data_log[, 1:5]
+tumor <- k_means_data_log[, 6:10]
 control_mean <- apply(control, 1, mean)
 tumor_mean <- apply(tumor, 1, mean)
 fold = control_mean - tumor_mean
@@ -703,7 +704,8 @@ points (fold[filter_combined & fold > 0],
 log_regression <- k_means_data[,c(1,2,4,5,8,9,10)]
 log_regression <- t(log_regression)
 log_regression <- data.frame(log_regression)
-testingset <- k_means_data[,c(3,6,7)]
+test_set <- k_means_data[,c(3,6,7)]
+test_set <- data.frame(t(test_set))
 
 
 healthstatus <- annotation$DISEASE
@@ -711,16 +713,18 @@ healthstatus <- data.frame(healthstatus)
 healthstatus_regression <- healthstatus[c(1, 2, 4, 5, 8, 9, 10),]
                                       
 
-trainingset <- cbind(healthstatus_regression, log_regression)
-regression_model <- glm(healthstatus_regression ~ trainingset[,1], family = "binomial", data = log_regression)
-predict(regression_model, type = "response")
+train_set <- cbind(healthstatus_regression, log_regression)
+#regression_model <- glm(healthstatus_regression ~ train_set[,1], family = "binomial", data = log_regression)
+regression_model <- glm(healthstatus_regression ~ ., family = "binomial", data = train_set)
+summary(regression_model)
+prediction <- predict(regression_model, newdata = test_set, type = "response")
+levels(train_set$healthstatus_regression)
 
                                       
-#glm logistic regression (multicollinearity)
-#predict (threshold = 0.5), IMPORTANT: type = "response".
-
-#model with cross validation
-#vale sends the code :)
-#same but with two dataframe
-
-
+#glm logistic regression (multicollinearity) without cross validation
+k_means_data_no_cv <- t(k_means_data)
+k_means_data_no_cv <- data.frame(k_means_data_no_cv)
+full_data <- cbind(healthstatus, k_means_data_no_cv)
+model_no_cv <- glm(healthstatus ~ ., family = "binomial", data = full_data)
+prediction_no_cv <- predict(model_no_cv, newdata = full_data, type = "response")
+summary(model_no_cv)
