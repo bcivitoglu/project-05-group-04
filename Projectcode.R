@@ -644,17 +644,14 @@ pvalues <- data.frame(p_value)
 #to show them in rising order do this, but then the information about which gene it is gets lost
 #pvalues <- sort(pvalues$p_value, decreasing = F)
 #pvalues <- data.frame(pvalues)
-
-
 #Possible combination add p values to gene names 
-row_names <- row.names(k_means_data)
-p_combined <- pvalues
-rownames(p_combined) <- row_names
-
+#row_names <- row.names(k_means_data)
+#p_combined <- pvalues
+#rownames(p_combined) <- row_names
 #symbol with p values and ID (stimmt nicht, hier ist immer noch kein p value dabei)
-symbols <- data.frame(genes$symbol)
-row_names2 <- row.names(genes)
-rownames(symbols) <- row_names2
+#symbols <- data.frame(genes$symbol)
+#row_names2 <- row.names(genes)
+#rownames(symbols) <- row_names2
 
 #this is just for our markdown where we have to show our clusters, we have to delete it in our code after we made the markdown
 #View(beta_genes_healthy)
@@ -671,10 +668,10 @@ p_holm <- data.frame(p_combined)
 #fold change calculation
 #log2 fold change (use normal and not log)
 #Da wir negative Werte haben in den M values, nutzen wir nicht den log2, obwohl man das normalerweise bei einem foldchange macht.
-t_test_beta <- beta_genes_cleaned[genes_top_10000,]
-k_means_data_log <- log2(t_test_beta)
-control <- k_means_data_log[, 1:5]
-tumor <- k_means_data_log[, 6:10]
+beta_10000 <- beta_genes_cleaned[genes_top_10000,]
+beta_10000_log <- log2(beta_10000)
+control <- beta_10000_log[, 1:5]
+tumor <- beta_10000_log[, 6:10]
 control_mean <- apply(control, 1, mean)
 tumor_mean <- apply(tumor, 1, mean)
 fold = control_mean - tumor_mean
