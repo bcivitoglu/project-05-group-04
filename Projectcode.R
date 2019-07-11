@@ -645,9 +645,9 @@ pvalues <- data.frame(p_value)
 #pvalues <- sort(pvalues$p_value, decreasing = F)
 #pvalues <- data.frame(pvalues)
 #Possible combination add p values to gene names 
-#row_names <- row.names(k_means_data)
-#p_combined <- pvalues
-#rownames(p_combined) <- row_names
+row_names <- row.names(k_means_data)
+p_combined <- pvalues
+rownames(p_combined) <- row_names
 #symbol with p values and ID (stimmt nicht, hier ist immer noch kein p value dabei)
 #symbols <- data.frame(genes$symbol)
 #row_names2 <- row.names(genes)
