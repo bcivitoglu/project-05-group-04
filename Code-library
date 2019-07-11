@@ -188,3 +188,7 @@ plot(density(log10(cov_genes_means_healthy)), xlab = "coverage means", main = "c
 
 cov_genes_means_cancer <- rowMeans(data.matrix(cov_genes_cancer))
 plot(density(log10(cov_genes_means_cancer)), xlab = "coverage means", main = "coverage distribution")
+
+#code to save a dataframe as rds
+#setwd("workingdirectory"
+#saveRDS(genes, file = "genes.rds")
