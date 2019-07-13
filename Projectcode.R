@@ -641,17 +641,10 @@ for(i in 1:nrow(k_means_data)){
 #create a dataframe wich contains the p-values from t-test 
 pvalues <- data.frame(p_value)
 
-#to show them in rising order do this, but then the information about which gene it is gets lost
-#pvalues <- sort(pvalues$p_value, decreasing = F)
-#pvalues <- data.frame(pvalues)
 #Possible combination add p values to gene names 
 row_names <- row.names(k_means_data)
 p_combined <- pvalues
 rownames(p_combined) <- row_names
-#symbol with p values and ID (stimmt nicht, hier ist immer noch kein p value dabei)
-#symbols <- data.frame(genes$symbol)
-#row_names2 <- row.names(genes)
-#rownames(symbols) <- row_names2
 
 #this is just for our markdown where we have to show our clusters, we have to delete it in our code after we made the markdown
 #View(beta_genes_healthy)
@@ -664,6 +657,10 @@ p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
 #p_combined = sort(p_combined$p_adjusted, decreasing = F)
 p_holm <- data.frame(p_combined)
 
+#Creating new dataframe to see our most important genes by name and order it in the correct way
+symbols <- genes[rownames(p_holm),]
+holm <- cbind(p_holm, "Symbols" = symbols$symbol)
+holm_new <- holm[order(holm$p_value),]
 
 #fold change calculation
 #log2 fold change (use normal and not log)
