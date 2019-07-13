@@ -657,10 +657,25 @@ p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
 #p_combined = sort(p_combined$p_adjusted, decreasing = F)
 p_holm <- data.frame(p_combined)
 
-#Creating new dataframe to see our most important genes by name and order it in the correct way
+#Creating new dataframe to see our most important genes by name
 symbols <- genes[rownames(p_holm),]
 holm <- cbind(p_holm, "Symbols" = symbols$symbol)
+
+##Order it in the correct way
 holm_new <- holm[order(holm$p_value),]
+
+##Look for genes out of literature 
+grep("gene_name", holm_new$Symbols, value = TRUE)
+
+#ENSG00000048462 -> TNFRSF17
+#ENSG00000159958 -> TNFRSF13C
+#ENSG00000232810 -> TNF 
+#ENSG00000233125 -> ACTBP12 (Not that important, because original gene out of literature was named "CTBP2")
+
+##Create the final dataset with significant genes (corrected p values) combined with the genes out of literature left after the t test
+relevant_genes1 <- holm_new[c(1:31),]
+relevant_genes2 <- holm_new[c("ENSG00000048462","ENSG00000159958","ENSG00000232810","ENSG00000233125"),]
+relevant_genes <- rbind(relevant_genes1,relevant_genes2)
 
 #fold change calculation
 #log2 fold change (use normal and not log)
