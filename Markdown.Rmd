@@ -730,10 +730,57 @@ points (fold[filter_combined & fold > 0],
         pch = 16, col = "blue")
 ```
 
+###Logistic regression
 
+Logistic regression is used to model the relationship between a binary outcome variable and one or more predictor variables. In this case, the predictor variables are methylation data of the genes and the outcome is either healthy or sick. Hence we want to **predict a patient's health status by the methylation status of their genes**.
 
+We create a dataframe, which contains M values and health status of 7 random patients. Therefore, the M value dataframe needs to be transformed first. We then add the patients' health status. This data frame is used for generating the logistic regression model. We then do cross validation by applying the regression model to the test set data frame and by checking whether the predicted and actual health status match, we can see if the regression model makes works.
 
+```{r}
+log_regression <- k_means_data[,c(1,2,4,5,8,9,10)]
+log_regression <- t(log_regression)
+log_regression <- data.frame(log_regression)
+test_set <- k_means_data[,c(3,6,7)]
+test_set <- data.frame(t(test_set))
 
+healthstatus <- annotation$DISEASE
+healthstatus <- data.frame(healthstatus)
+healthstatus_regression <- healthstatus[c(1, 2, 4, 5, 8, 9, 10),]
 
+train_set <- cbind(healthstatus_regression, log_regression)
 
+regression_model <- glm(healthstatus_regression ~ ., family = "binomial", data = train_set)
+summary_regression_model <- summary(regression_model)
+summary_regression_model$coefficients
+```
 
+We only get estimate values for the genes shown above whereas the values for the remainig genes are NA and therefore not shown in the table. This is because of multicollinearity, which means that one or more predictor variables are highly correlated and consequently do not contribute to the regression model.
+The estimate value explains the influence of the predictor variable on the outcome variable. Positive values indicate that a gene contributes to health whereas genes with negative values promote disease.
+It is notable that we get high standard errors, which implies that the regression model is not very reliable. These high standard error values result from mulitcollinearity.
+
+```{r}
+prediction <- predict(regression_model, newdata = test_set, type = "response")
+prediction
+levels(train_set$healthstatus_regression)
+```
+
+Since we only have very few data available, the prediction of the logistic regression model based on the train set containing 70% of our data does not correspond with the actual health status. Even though the predicted probability is 10^6 times higher for the healthy patient than for the ones with CLL, it is still very close to 0, which implies that the patient is probably sick.
+Therefore we use all data available to model logistic regression without performing cross validation.
+
+```{r}
+k_means_data_no_cv <- t(k_means_data)
+k_means_data_no_cv <- data.frame(k_means_data_no_cv)
+full_data <- cbind(healthstatus, k_means_data_no_cv)
+model_no_cv <- glm(healthstatus ~ ., family = "binomial", data = full_data)
+prediction_no_cv <- predict(model_no_cv, newdata = full_data, type = "response")
+summary_model_no_cv <- summary(model_no_cv)
+summary_model_no_cv$coefficients
+```
+
+We now apply the second model to our data set.
+
+```{r}
+prediction_no_cv
+```
+
+The predicted probability to be healthy is 1 for the healthy patients and very close to 0 for the sick patients, so it corresponds with the actual health status. This is the result we expected, since we made the prediction for the data we used to create the model.
