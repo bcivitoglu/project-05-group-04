@@ -540,7 +540,7 @@ total_pvalue <- data.matrix(total_pvalue)
 #####Preparation for heatmap 
 
 To **decide which PC we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
-For analyzing and comparing all p-values we state all p-values under 0.1 as significant. To make visualisation easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
+For analyzing and comparing all p-values we state all p-values under 0.1 as significant. To make visualization easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
 
 ```{r}
 for (i in 1:ncol(total_pvalue)){
@@ -580,7 +580,7 @@ Therefore **we go on with our analysis using principal component 2** which doesn
 
 #####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
 
-Now we want to **find the most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the most 1000 important genens in principal component 2 in ranked order.
+Now we want to **find the most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the most 1000 important genes in principal component 2 in ranked order.
 
 ```{r}
 loading_scores <- pca_M$rotation[,2]
@@ -597,7 +597,7 @@ Now we want to **decide how many genes we want to keep for our further analysis*
 plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
 ```
 
-Actually there is a knik in the elbow plot of loading scores of the genes at round about 2000 genes. K-means clustering already worked with 2000 genes but by using only 2000 genes we get only 3 significant different methylated genes, which is not sufficient. By using 10000 genes we get 31 different methylated genes, which is an amount with which we can work with. 
+Actually there is a kink in the elbow plot of loading scores of the genes at round about 2000 genes. K-means clustering already worked with 2000 genes but by using only 2000 genes we get only 3 significant different methylated genes, which is not sufficient. By using 10000 genes we get 31 different methylated genes, which is an amount with which we can work with. 
 
 #####create a dataframe containing all M-values from the 10000 most important genes for principal component 2.
 
@@ -608,7 +608,7 @@ k_means_data <- M_genes[genes_top_10000,]
 
 ###Clustering with k-means
 
-K-means is a method to find groups in the data. It uses an iterative Algorithm which means that there is a repitition of steps with the aim of finding the right cluster for each datapoint. First step is the clustering which means that the datapoints get split up into k clusters. Each datapoint gets allot the its next clusterpoint. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as one set in the code. By performing k-means clustering we want to **ckeck whether sick and healthy patients are separated in two different clusters.**
+K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repitition of steps with the aim of finding the right cluster for each datapoint. First step is the clustering which means that the datapoints get split up into k clusters. Each datapoint gets alloted to its next clusterpoint. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as set in the code. By performing k-means clustering we want to **check whether sick and healthy patients are separated in two different clusters.**
 
 ```{r}
 k <- kmeans(x = t(k_means_data), centers = 2, iter.max = 1000)
