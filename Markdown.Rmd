@@ -24,8 +24,8 @@ The analysis will be done in several steps:
 2. **Normalisation**
   * Preparing beta-values
   * Transformation of beta-values into M-values
-3. **Data reduction**
-  * Dimensionality reduction via PCA
+3. **Dimensionality reduction**
+  * PCA
   * Batch effect analysis
 4. **Clustering**
   * Via K-means clustering
@@ -40,13 +40,13 @@ The analysis will be done in several steps:
 7. **Data interpretation**
 
 
-### Data processing
+## 1) Data processing
 
 
 Before we can start analysing our data set it has to be tidied up to make it easy for us to work with it by making it as clear as possible. Datasets have to be split up and reorganized, coloums removed or renamed and a quality control concering coverage values, beta values, NAs and specific DNA segments showing unusual values, needs to be performed.
 
 
-#### Reading in the datasets
+### Reading in the datasets
 
 We start by **reading in our CLL-Bcell-data and the annotations** which is an extra document explaining where our data is coming from.
 
@@ -56,7 +56,7 @@ annotation <- read.csv("sample_annotation.csv")
 ```
 
 
-#### Reorganisation of the data
+### Reorganisation of the data
 
 Our main dataset, the one containing the data we are working with, is `input_data`. It contains methylation data in form of beta values and coverage values of B-cells of five healthy patients and five patients suffering from CLL. It is divided into four subgroups: tiling, genes, promoters and CpG islands. We have to analyse those subgroups separatly, because methylation in promoters, genes and CpG islands can have different biological reasons and also this way the data the computer deals with is not that much while running the algorithm. Therefor **the dataset gets divided into four subdatasets**.
 
@@ -79,7 +79,7 @@ colnames(genes)[11:30] <- c("P1_healthy_beta","P2_healthy_beta","P3_healthy_beta
 ```
 
 
-####Quality control
+###Quality control
 
 It is important to remove values that are not needed for or even hinder further analysis. Among other values those are also coverage values, which seem to be unrealistically high due to PCR dublicates or repetetive regions. Also they can be or that low, so the belonging beta-value of the DNA section has no meaning, because there was no fitting allignment when mapping back PCR fragments onto the genome. 
 A **data frame only containing coverage values** is created.
@@ -90,7 +90,7 @@ cov_genes <- genes[,c(1,21:30)]
 
 At this point we already delete some genes, which are the genes on the X- and Y-chromosome. Somehow there must have been problems in obtaining the beta and coverage values for those chromosomes, because the beta-values are either not a number (NaN) or mainly 1.000, which must definitely be a mistake.The belonging coverage is in most cases 0, so we can not use those beta-values values anyway. Following code **removes the X- and Y-chromosome**. 
 
-#####Removing genes on X- and Y-chsomosome
+####Removing genes on X- and Y-chsomosome
 
 ```{r}
 cov_genes_new <- cov_genes[-which(cov_genes =="chrX"),]
@@ -100,7 +100,7 @@ cov_genes <- cov_genes[ ,c(2:11)]
 ```
 
 
-#####Finding a coverage value threshold
+####Finding a coverage value threshold
 
 But back to the very high or low coverage values: There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value distribution among all patients using a logarithmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated.
 ```{r}
@@ -127,7 +127,7 @@ Both lower thresholds and the highest upper threshold seem to be fitting looking
 The procedure will now be to set all the coverage values in `cov_genes`to NA, that are below or above the chosen threshold. Then all the beta-values belonging to those coverage values set to NA will be set to an NA, too. Eventually we will set another threshold for the beta-values, defining above which number of NA per row (meaning gene), the row will be deleted. Therefor we will need two nested for-loops.
 
 
-#####Preparing the first nested for-loop
+####Preparing the first nested for-loop
 
 Before we can set a threshold, the few **NAs among the coverage values need to be set to 0**. This way they will be set to NAs again after the loop, but they also don't hinder the loop from working.
 
@@ -144,7 +144,7 @@ threshold2 <- quantile(cov_genes_means, probs = seq(0.90,0.90,0.05))
 ```
 
 
-#####The first nested for-loop
+####The first nested for-loop
 
 Now a **nested for-loop** can set the coverage values underneath and above the set threshold to NA.
 This will be done for each row and each column of the dataframe `cov_genes`.
@@ -164,7 +164,7 @@ rm(i,j,threshold1,threshold2)
 ```
 
 
-#####Preparing the second nested for-loop
+####Preparing the second nested for-loop
 
 A second nested for-loop is used to set the beta-values to NA that belong to the coverage values set to NA. Also here a **dataframe containing only beta-values** is created and the **genes located on the X- or Y-chromosome get removed**.
 
@@ -176,7 +176,7 @@ rm(beta_genes_new)
 beta_genes <- beta_genes [ ,c(2:11)]
 ```
 
-#####The second nested for-loop
+####The second nested for-loop
 
 This **second nested for-loop** checks every row and every column of the dataframe `cov_genes`.
 If there is an NA, it sets the belonging beta-value in `beta_genes` to NA, too.
@@ -193,7 +193,7 @@ rm(k,l)
 ```
 
 
-#####Finding a threshold for NAs among the beta-values
+####Finding a threshold for NAs among the beta-values
 
 Now the second threshold in quality control needs to be chosen. This one is for the upper and lower threshold of allowed NAs per row (gene) among the beta-values.
 Since some beta-values were set to NA in the last step, we want to get insight in **how many NAs we actually have now**.
@@ -221,11 +221,11 @@ sum(genes_deleted_percentage)
 With 7% we are beneath the recomended upper limit of 15 % of deleted rows.
 
 
-###Normalisation
+##2) Normalisation
 
 The tidy beta-values we have now are an approximation of the percentage of DNA-methylation. Biologically beta-values are easy to understand. They range from 0 to 1, while 0 is unmethylated and 1 is fully methylated. But their bounded range is also a disadvantage. It leads to the problem that they can not be used for statistical tests like the t-test, because they violate the Gaussian distribution. For highly methylated gene regions and unmethylated gene regions beta-values are very heteroscedastic, which means, that the variability of a variable is unequal across the range of values. Therefor we do a normalisation. Beta-values need to be transformed into M-values via a logit transformation. M-values do not have a bounded range, they can be infinite big and small. While the middle methylation range (beta-value range of 0,2-0,8) is linear to M-values, outside this range the beta-values are compressed and the M-values more accurate and homoscedastic. This is why M-values can be used for statistical tests and are absolutely necessary for further analysis.
 
-####Preparing beta-values for logit transformation
+###Preparing beta-values for logit transformation
 
 Logit transformation turns the extreme beta-values 0 and 1 into -infinite and infinite. We can not work with those values, because further tests don't know how to deal with an infinite number. Due to that we apply a little trick and **set 0 to a very small number higher than 0, and 1 to a very big number less than 1**.
 
@@ -235,7 +235,7 @@ beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 ```
 
 
-#####Creating two seperate data frames for sick and healthy patients
+####Creating two seperate data frames for sick and healthy patients
 
 For doing our Normalisation were we transform our beta-values into M-values we have to **split up our data into beta-values of healthy and sick patients.**
 
@@ -255,7 +255,7 @@ beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
 ```
 
 
-####Transforming beta-values into M-values
+###Transforming beta-values into M-values
 
 In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data. We calculate the M-values with the equation M-value = log2(beta-value/(1??? beta-value)).
 
@@ -273,13 +273,13 @@ colnames(M_genes) <- c("1H","2H","3H","4H","5H","6CLL","7CLL","8CLL","9CLL","10C
 ```
 
 
-###Dimensionality reduction
+##3) Dimensionality reduction
 
 To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller set which still contains most information of the large dataset. Through the PCA, correlated variables get transformed into a much smaller number of uncorrelated variables which are called principal components.
 We want to have less variables, because it is easier to work with them. 
 
 
-####PCA
+###PCA
 
 The code for the **PCA** expects the patients to be rows and the samples to be columns. In our data the patients are columns and the genes are rows so we have to **transpose the matrix** with the t() function. 
 
@@ -288,7 +288,7 @@ pca_M <- prcomp(t(M_genes))
 ```
 
 
-#####How much variation does each component account for?
+####How much variation does each component account for?
 
 To decide, how much principal components we want to work with, we have to know how much variation each principal component accounts for in percentage. We plot the percentage for each component and decide with the "elbow method" with which number of components we have to work with. 
 
@@ -302,7 +302,7 @@ In the plot we can not see an elbow so we would actually have to work on with te
 
 
 
-#####Drawing a 2D plot of component 1 and 2
+####Drawing a 2D plot of component 1 and 2
 
 To check whether we have a batch effect, we plot principal component 1 against principle component 2. 
 
@@ -322,7 +322,7 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
 
 
 
-####Investigation for batch effect 
+###Investigation for batch effect 
 
 Now we use different categories of the annotation table which possibly might cause **batch effect** and divide them by colour and shape in our graph of principal component 1 and 2.
 Batch effect is a **technical source of error**, which could have been added to the samples by e.g. gender. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
@@ -364,7 +364,7 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 ```
 
 
-#####Checking our PC 1 to 5 for significant batch effect per category 
+####Checking our PC 1 to 5 for significant batch effect per category 
 
 To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the category of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
 For numbers we use the **permutation test** (of Pearson's r correlation coefficient), for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
@@ -378,7 +378,7 @@ batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 ```
 
 
-#####Permutation test for numbers
+####Permutation test for numbers
 
 The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counterhypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
 
@@ -416,7 +416,7 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 ```
 
 
-#####Wilcoxon test for 2 categories
+####Wilcoxon test for 2 categories
 
 The **Wilcoxon test** for dependent spot checks tests, whether the central tendencies are different. "Dependent spot checks" is used if one measurement in a sample and one measurement in another sample influence each other. In three situations this is the case:
 1) Repeated measures
@@ -466,7 +466,7 @@ p_BIOMATERIAL_PROVIDER <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL
 p_Predicted.Gender <- data.frame(pc_1_Predicted.Gender, pc_2_Predicted.Gender, pc_3_Predicted.Gender, pc_4_Predicted.Gender, pc_5_Predicted.Gender)
 ```
 
-#####Kruskal-Wallis for several categories
+####Kruskal-Wallis for several categories
 
 The **Kurskal-Wallis test** checks, whether there is a difference in central tendencies between several independent spot checks. The test is used, if the prerequisites for a parametric method is not fulfilled. One of the benefits of the test is that the data does not have to be normally distributed. On the other hand, the test can also be calculated for small samples and outliers.
 Basically it is possible to check for a batch effect with several categories.
@@ -533,7 +533,7 @@ rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <-
 
 
 
-#####Preparation for heatmap 
+####Preparation for heatmap 
 
 To **decide which PC we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
 For analyzing and comparing all p-values we state all p-values under 0.1 as significant. To make visualization easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
@@ -555,7 +555,7 @@ for (i in 1:ncol(total_pvalue)){
 ```
 
 
-#####Heatmap 
+####Heatmap 
 
 ```{r}
 library(gplots)
@@ -586,7 +586,7 @@ par(cex.main = 1)
 By looking at the heatmap or at the p-values one can see that principal component 1 has a batch effect.
 Therefore **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
 
-#####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
+####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
 
 Now we want to **find the most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
 
@@ -598,7 +598,7 @@ genes_top_10000 <- names(ranked_gene_score[1:10000])
 genes_top_2000 <- names(ranked_gene_score[1:2000])
 ```
 
-#####Look for elbow in top gene variance
+####Look for elbow in top gene variance
 
 Now we want to **decide how many genes we want to keep for our further analysis** by looking for an elbow in the plot of loading scores. 
 
@@ -609,7 +609,7 @@ plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
 Actually there is a kink in the elbow plot of loading scores of the genes at round about 2000 genes. K-means clustering already worked with 2000 genes but by using only 2000 genes we get only 3 significant different methylated genes, which is not sufficient. By using 10000 genes we get 24 differentially methylated genes, which is an amount which we can work with. 
 
 
-###Clustering with k-means
+##4) Clustering with k-means
 
 K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repitition of steps with the aim of finding the right cluster for each datapoint. First step is the clustering which means that the datapoints get split up into k clusters. Each datapoint gets alloted to its next clusterpoint. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as set in the code. By performing k-means clustering we want to **check whether sick and healthy patients are separated in two different clusters.** Therefor we first create two dataframes containing all M-values from the 2000 and 10000 most important genes for principal component 2.
 
@@ -633,9 +633,9 @@ One can see that our sick and healthy patients belong to two different clusters 
 
 
 
-### Identifying differetially methylated regions (DMRs)
+##5) Identifying differetially methylated regions (DMRs)
 
-####Student's t-test
+###Student's t-test
 
 To see whether the methylation differences, so differences in M-values, between the two Sample groups are significant, **a student t-test is performed**. It can be used, because due to normalisation the varaiance of the values are equal now. The test compares the mean M-value of sick patients to the mean M-value of healthy patients and gives a p-value, which is significant or not depending on how strict is the threshold you set.
 
@@ -665,7 +665,7 @@ rownames(p_combined) <- row_names
 ```
 
 
-####Correction of p values by using the holm method
+###Correction of p values by using the holm method
 
 To reduce the family-wise error rate, which is the propability of getting one ore more type 1 errors (also called false positive error), the *holm method* is used. Besides a *dataframe* containing the uncorrected p-values and the corrected p-values in rising order and the belonging gene ID and symbol is created.
 
@@ -679,7 +679,7 @@ holm_new <- holm[order(holm$p_value),]
 
 
 
-####Finding DMRs
+###Finding DMRs
 
 Only 24 genes are significantly differently methylated using a threshold of a corrected p-value of  0,1.
 Besides there have been genes, often correlated to CLL, which we found in literature before.
@@ -730,11 +730,11 @@ print(relevant_genes)
 ```
 
 
-####Statistical and biological relevant methylation differences in genes
+###Statistical and biological relevant methylation differences in genes
 
 A vulcano plot can help visualising whether a gene is claimed to be differently methylated in healthy and sick patients because of statistical reasons, which means a significant p-value or because of biological reasons, which would be a big difference in the mean of the M-values or beta-values. Only the genes which show both characteristics, really have a significant methylation difference.
 
-#####Fold change calculation
+####Fold change calculation
 
 On the x-axis of the volcano plot there is the **difference of the beta-value means of each sample group**. This is the axis showing the biological relevance. Usually for better visualization you use the log2 fold change of the M-values. Due to the negative M-values that exist, this is mathematically not possible. Therefor we do not use the log2 fold change of the M-values, but the one of the beta-values.
 
@@ -749,7 +749,7 @@ tumor_mean <- apply(tumor, 1, mean)
 fold = control_mean - tumor_mean
 ```
 
-#####Visualisation including information about hyper- and hypomethylation 
+####Visualisation including information about hyper- and hypomethylation 
 
 Also on the y-axis we have to improvise: The y-axis shows the p-values and therefor the statistical relevance. Actually the corrected p-values should be used, but somehow a lot of p-values were corrected to the value 1, which distorts the plot. Therefor we use the uncorrected p-values for the y-axis and **create a volcano plot**
 
@@ -786,7 +786,7 @@ points (fold[filter_combined & fold > 0],
 ```
 
 
-###Logistic regression
+##6) Logistic regression
 
 Logistic regression is used to model the relationship between a binary outcome variable and one or more predictor variables. In this case, the predictor variables are methylation data of the genes and the outcome is either healthy or sick. Hence we want to **predict a patient's health status by the methylation status of their genes**.
 
