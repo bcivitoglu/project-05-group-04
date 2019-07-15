@@ -336,28 +336,28 @@ ggplot_1 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for gender")
 
 ggplot_2 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for cell type/origin")
 
 ggplot_4 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for age")
 
 ggplot_3 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for biomaterial provider")
 
 library(gridExtra)
@@ -559,10 +559,15 @@ for (i in 1:ncol(total_pvalue)){
 
 ```{r}
 library(gplots)
+
+par(cex.main = 1)
+
 heatmap.2(
-  total_pvalue, main = "batch effect in our principal components", 
+  total_pvalue, main = "Batch effect in our principal components",
+  title(main, cex.main = 1 * op[["cex.main"]]),
+  margins = c(8,5),
   Colv = NA, 
-  Rowv = NA, 
+  Rowv = NA,
   dendrogram = "none", 
   sepwidth = c(0.01, 0.01), 
   sepcolor = "black", 
@@ -572,7 +577,9 @@ heatmap.2(
   seq(1.1, 10, length = 2)),
   colsep = 1:ncol(total_pvalue), 
   rowsep = 1:nrow(total_pvalue), 
-  key=FALSE)
+  cexCol = 0.7,
+  cexRow = 1,
+  key = FALSE)
 ```
 
 By looking at the heatmap or at the p-values one can see that principal component 1 has a batch effect.

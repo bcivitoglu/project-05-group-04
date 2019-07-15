@@ -187,7 +187,7 @@ ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("Graph of PC 1&2")
 
 ## 1&3
@@ -199,7 +199,7 @@ ggplot(data=pca_values3, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PCA Graph")
 
 ## 1&4
@@ -211,7 +211,7 @@ ggplot(data=pca_values4, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC4 - ", var_pca_per[4], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PCA Graph")
 
 
@@ -225,7 +225,7 @@ ggplot(data=pca_values23, aes(x=X, y=Y, label=Sample)) +
   geom_text(aes(colour = annotation$DISEASE)) +
   xlab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
   ylab(paste("PC3 - ", var_pca_per[3], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PCA Graph")
 
 ## 2&4
@@ -264,7 +264,7 @@ ggplot_1 <- ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$Predicted.Gender)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for gender")
 
 
@@ -272,7 +272,7 @@ ggplot_2 <- ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$SAMPLE_DESC_3)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for cell type/origin")
 
 #auf das alter testen wir die signifikanz des batch effektes sp??ter nicht, denn eigentlich ist alter kein batch effekt, sonden sorgt f??r Unterschiede, die biologisch bedingt sind.
@@ -280,14 +280,14 @@ ggplot_4 <- ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$DONOR_AGE)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for age")
 
 ggplot_3 <- ggplot(data=pca_values2, aes(x=X, y=Y, label=Sample)) +
   geom_point(aes(shape=annotation$cellTypeGroup, color=annotation$BIOMATERIAL_PROVIDER)) +
   xlab(paste("PC1 - ", var_pca_per[1], "%", sep="")) +
   ylab(paste("PC2 - ", var_pca_per[2], "%", sep="")) +
-  theme_bw() +
+  theme_bw(base_size = 6) +
   ggtitle("PC1&2 check for biomaterial provider")
 
 #install.packages("gridExtra")
@@ -593,7 +593,28 @@ for (i in 1:ncol(total_pvalue)){
 
 ##heatmap 
 library(gplots)
-heatmap.2(total_pvalue, main = "batch effect in our principal components", Colv = NA, Rowv = NA, dendrogram = "none", sepwidth = c(0.01, 0.01), sepcolor = "black", trace= "none", col = colorRampPalette(c("salmon","blue")), breaks = c(seq(0, 1, length = 2),seq(1.1, 10, length = 2)),colsep = 1:ncol(total_pvalue), rowsep = 1:nrow(total_pvalue), key=FALSE)
+
+par(cex.main = 1)
+
+heatmap.2(
+  total_pvalue, main = "Batch effect in our principal components",
+  title(main, cex.main = 1 * op[["cex.main"]]),
+  margins = c(8,5),
+  Colv = NA, 
+  Rowv = NA,
+  dendrogram = "none", 
+  sepwidth = c(0.01, 0.01), 
+  sepcolor = "black", 
+  trace= "none", 
+  col = colorRampPalette(c("salmon","blue")), 
+  breaks = c(seq(0, 1, length = 2),
+             seq(1.1, 10, length = 2)),
+  colsep = 1:ncol(total_pvalue), 
+  rowsep = 1:nrow(total_pvalue), 
+  cexCol = 0.7,
+  cexRow = 1,
+  key = FALSE)
+
 ##Principal component 1 has a batch effect which you can see looking at the significant p values or at the heatmap
 ##Therefor we go on with our analysis using Principal component 2 which does't show a batch effect at all.
 
@@ -725,8 +746,9 @@ healthstatus_regression <- healthstatus[c(1, 2, 4, 5, 8, 9, 10),]
 train_set <- cbind(healthstatus_regression, log_regression)
 #regression_model <- glm(healthstatus_regression ~ train_set[,1], family = "binomial", data = log_regression)
 regression_model <- glm(healthstatus_regression ~ ., family = "binomial", data = train_set)
-summary(regression_model)
+summary_regression_model <- summary(regression_model)
 prediction <- predict(regression_model, newdata = test_set, type = "response")
+print(prediction)
 levels(train_set$healthstatus_regression)
 
                                       
@@ -736,4 +758,5 @@ k_means_data_no_cv <- data.frame(k_means_data_no_cv)
 full_data <- cbind(healthstatus, k_means_data_no_cv)
 model_no_cv <- glm(healthstatus ~ ., family = "binomial", data = full_data)
 prediction_no_cv <- predict(model_no_cv, newdata = full_data, type = "response")
-summary(model_no_cv)
+print(prediction_no_cv)
+summary_model_no_cv <- summary(model_no_cv)
