@@ -122,21 +122,20 @@ abline(v=log10(10))
 abline(v=log10(15))
 ```
 
-Both lower thresholds and the highest upper threshold seem to be fitting looking at the diagram. But which threshold we will chose eventually also depends on the percentage of deleted rows at the end of quality control. It shouldn't be deleted more than 15 % of the rows, because PCA will reduce the amount even more and we don't want to lose too much information.
+Both lower thresholds and the highest upper threshold seem to be fitting looking at the diagram. But which threshold we will chose eventually also depends on the percentage of deleted rows at the end of quality control. We decided not to delete more than 15 % of the rows, because we don't want to risk to lose reliable information.
 
-The procedure will now be to set all the coverage values in `cov_genes`to NA, that are below or above the chosen threshold. Then all the beta-values belonging to those coverage values set to NA will be set to an NA, too. Eventually we will set another threshold for the beta-values, defining above which number of NA per row (meaning gene), the row will be deleted. Therefor we will need two nested for-loops.
+The procedure will now be used to set all the coverage values in `cov_genes` that are below or above the chosen threshold to NA. Then all the beta-values associated to those NA coverage values are also turned into NA. Eventually we will set another threshold for the beta-values, defining the maximum number of NA that each row can have in order not to be deleted. In order to do this, we used two nested for-loops.
 
 
 ####Preparing the first nested for-loop
 
-Before we can set a threshold, the few **NAs among the coverage values need to be set to 0**. This way they will be set to NAs again after the loop, but they also don't hinder the loop from working.
+Before applying a threshold to the coverage values, the few **NAs among the coverage values are set to 0** in order to allow the following for loops to work. These values will be set to NAs again after the loop, since 0 is below the lower threshold.
 
 ```{r}
-sum(is.na(cov_genes))
 cov_genes[is.na(cov_genes)] <- 0
 ```
 
-A **threshold can be chosen**. As the lower threshold we choose the coverage value 15, which is positioned at a kink of the coverage distribution diagram. As the upper coverage threshold we choose the 90 % quantile. Although it is not positioned at a kink in the diagram we consider it to be a good threshold, because it still only leads to a removal of 7(?) % in the end of the quality control, which is far underneath the upper limit of 15 %.
+As the lower threshold we choose the coverage value 15, which is positioned at a kink of the previously showed coverage distribution diagram. As the upper coverage threshold we choose the 90 % quantile. Although it is not positioned at a kink in the diagram we consider it to be a good threshold, because it still only leads to a removal of 7 % of the genes at the end of the quality control, which is far underneath the chosen upper limit of 15 %.
 
 ```{r}
 threshold1 <- 15
@@ -146,7 +145,7 @@ threshold2 <- quantile(cov_genes_means, probs = seq(0.90,0.90,0.05))
 
 ####The first nested for-loop
 
-Now a **nested for-loop** can set the coverage values underneath and above the set threshold to NA.
+Now a **nested for-loop** is used to set the coverage values underneath the lower threshold and above the upper threshold to NA.
 This will be done for each row and each column of the dataframe `cov_genes`.
 
 ```{r}
@@ -166,7 +165,7 @@ rm(i,j,threshold1,threshold2)
 
 ####Preparing the second nested for-loop
 
-A second nested for-loop is used to set the beta-values to NA that belong to the coverage values set to NA. Also here a **dataframe containing only beta-values** is created and the **genes located on the X- or Y-chromosome get removed**.
+A second nested for-loop is used to set the beta-values to NA that correspond to the NA coverage values. A **dataframe containing only beta-values** is created and the **genes located on the X- or Y-chromosome are removed**.
 
 ```{r}
 beta_genes <- genes[,c(1,11:20)]
@@ -195,21 +194,21 @@ rm(k,l)
 
 ####Finding a threshold for NAs among the beta-values
 
-Now the second threshold in quality control needs to be chosen. This one is for the upper and lower threshold of allowed NAs per row (gene) among the beta-values.
+Now the second threshold in quality control needs to be chosen. The threshold establishes how many NA are allowed per gene in order for the gene not be completely deleted.
 Since some beta-values were set to NA in the last step, we want to get insight in **how many NAs we actually have now**.
 
 ```{r}
 rmv.rows_beta_genes = apply(beta_genes,1, function(x){sum(is.na(x))})
 ```
 
-A new dataframe containing only beta-values for genes which are inside the threshold is created.
-We chose a threshold of 3 allowed NAs per row (gene), so **every row containing more than 3 NAs gets removed**.
+A new dataframe containing only beta-values for genes which are below the NA threshold is created.
+We chose a threshold of 3 allowed NAs per row (gene), so **every row containing more than 3 NAs gets removed**. 
 
 ```{r}
 beta_genes_cleaned <- beta_genes[-which(rmv.rows_beta_genes >2),]
 ```
 
-To see **how many rows are gone** due to quality control the numer of rows before and after get compared. Also we hava a look at the **percantage of rows deleted** and see wether it is beneath 15 %.
+To see **how many rows are deleted** due to quality control the numer of rows before and after quality control is compared. We additionally have a look at the **percantage of rows deleted** and see whether it is beneath 15 %.
 
 ```{r}
 row_difference = nrow(genes)-nrow(beta_genes_cleaned)
@@ -218,16 +217,16 @@ genes_deleted_percentage = row_difference/nrow(genes)*100
 sum(genes_deleted_percentage)
 ```
 
-With 7% we are beneath the recomended upper limit of 15 % of deleted rows.
+With 7% we are beneath the recommended upper limit of 15 % of deleted rows.
 
 
 ##2) Normalisation
 
-The tidy beta-values we have now are an approximation of the percentage of DNA-methylation. Biologically beta-values are easy to understand. They range from 0 to 1, while 0 is unmethylated and 1 is fully methylated. But their bounded range is also a disadvantage. It leads to the problem that they can not be used for statistical tests like the t-test, because they violate the Gaussian distribution. For highly methylated gene regions and unmethylated gene regions beta-values are very heteroscedastic, which means, that the variability of a variable is unequal across the range of values. Therefor we do a normalisation. Beta-values need to be transformed into M-values via a logit transformation. M-values do not have a bounded range, they can be infinite big and small. While the middle methylation range (beta-value range of 0,2-0,8) is linear to M-values, outside this range the beta-values are compressed and the M-values more accurate and homoscedastic. This is why M-values can be used for statistical tests and are absolutely necessary for further analysis.
+The tidy beta-values we have now are an approximation of the percentage of DNA-methylation. Biologically beta-values are easy to understand. They range from 0 to 1, where 0 means unmethylated and 1 means fully methylated. But their bounded range is also a disadvantage. It leads to the problem that they can not be used for statistical tests like the t-test, because they violate the Gaussian distribution. For highly methylated gene regions and unmethylated gene regions beta-values are very heteroscedastic, which means, that the variability of a variable is unequal across the range of values. Therefore we have to normalise them. Beta-values need to be transformed into M-values via a logit transformation. M-values do not have a bounded range, they can be infinite big and small. While the middle methylation range (beta-value range of 0,2-0,8) is linear to M-values, outside this range the beta-values are compressed and the M-values more accurate and homoscedastic. This is why M-values can be used for statistical tests and are absolutely necessary for further analysis.
 
 ###Preparing beta-values for logit transformation
 
-Logit transformation turns the extreme beta-values 0 and 1 into -infinite and infinite. We can not work with those values, because further tests don't know how to deal with an infinite number. Due to that we apply a little trick and **set 0 to a very small number higher than 0, and 1 to a very big number less than 1**.
+Logit transformation turns the extreme beta-values 0 and 1 into -infinite and infinite. Further tests cannot be computed if some values are equal to -infinite and infinite. Because of this, we **set 0 to a very small number higher than 0, and 1 to a very big number smaller than 1**.
 
 ```{r}
 beta_genes_cleaned[beta_genes_cleaned==0]<-0.00000001
@@ -237,14 +236,14 @@ beta_genes_cleaned[beta_genes_cleaned==1]<-0.99999999
 
 ####Creating two seperate data frames for sick and healthy patients
 
-For doing our Normalisation were we transform our beta-values into M-values we have to **split up our data into beta-values of healthy and sick patients.**
+In order to perform our normalisation, we **split our data into beta-values of healthy and diseased patients.**
 
 ```{r}
 beta_genes_healthy <- beta_genes_cleaned[,c(1:5)]
 beta_genes_cancer <- beta_genes_cleaned[,c(6:10)]
 ```
 
-Now we are able to **replace the remaining NA's by the row means of the different genes.** We suspect that the rowmeans differ between healthy and sick patients so it is important to work with the two dataframes.
+Now we are able to **replace the remaining NA's by the row means of the different genes.**The rowmeans is different between healthy and sick patients so it is important to work with the two separated dataframes.
 
 
 ```{r}
@@ -257,7 +256,9 @@ beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
 
 ###Transforming beta-values into M-values
 
-In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data. We calculate the M-values with the equation M-value = log2(beta-value/(1??? beta-value)).
+In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data. We calculate the M-values with the following equation:
+
+$$M-value = log2(beta-value/(1??? beta-value))$$
 
 ```{r}
 M_genes_healthy <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
@@ -807,7 +808,7 @@ To visualise genes that are statistically and biologically relevant and subdivid
 
 ```{r}
 threshold_significant = 0.1
-threshold_fold = 1
+threshold_fold = 0.05
 ```
 
 We create a **filter for biological relevant genes** using the threshold for beta-value-difference, one for **statistically relevant genes** and one that **combines both in one filter**.
@@ -835,8 +836,8 @@ points (fold[filter_combined & fold > 0],
 ####Hyper- and hypomethylation in relevant genes
 
 We have had created a dataframe `relevant_genes` containing the genes which show significant differences in methylation and four genes, which do not show significant methylation differences between sick and healthy, but seem to be worth a look, because we read about them in literature before. But to know wether those genes in cancer patients are hyper or hypomethylated we need to have a look at the fold value. Therefor we **add the fold values to the relevant genes**.
-Genes in cancer patients are **upmethylated** if the **fold is negative** and the absolute fold higher than 1.
-And Genes are **downmethylated** if the **fold is positiv** and the absolute fold higher than 1.
+Genes in cancer patients are **upmethylated** if the **fold is negative** and the absolute fold higher than 0.05.
+And Genes are **downmethylated** if the **fold is positiv** and the absolute fold higher than 0.05.
 
 ``` {r}
 fold <- data.frame(fold)
