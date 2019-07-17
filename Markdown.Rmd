@@ -2,7 +2,10 @@
 title: "Cancer methylome analysis CLL vs. B-Cells"
 author: "Leona Brandl, Carlotta Brueggen, Tim Kuehn, Violetta Schaaf"
 date: "17th July 2019"
-output: html_document
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 
@@ -258,7 +261,7 @@ beta_genes_cancer[l] <- rowMeans(beta_genes_cancer, na.rm=TRUE)[l[,1]]
 
 In the next step we **transform our beta-values into M-values** so we are able to do statistical tests with the data. We calculate the M-values with the following equation:
 
-$$M-value = log2(beta-value/(1??? beta-value))$$
+$$M = log_2(\frac{beta}{1-beta})$$
 
 ```{r}
 M_genes_healthy <- log2(beta_genes_healthy/(1-(beta_genes_healthy)))
@@ -276,13 +279,12 @@ colnames(M_genes) <- c("1H","2H","3H","4H","5H","6CLL","7CLL","8CLL","9CLL","10C
 
 ##3) Dimensionality reduction
 
-To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller set which still contains most information of the large dataset. Through the PCA, correlated variables get transformed into a much smaller number of uncorrelated variables which are called principal components.
-We want to have less variables, because it is easier to work with them. 
-
+To **reduce our data** we use Principal Component Analysis. PCA reduces a large set of variables into a smaller one which still contains most of the information of the larger dataset. Through the PCA, correlated variables are turned into a much smaller number of uncorrelated variables which are called principal components.
+The goal is to have a smaller number of variables in order to make the computation easier. 
 
 ###PCA
 
-The code for the **PCA** expects the patients to be rows and the samples to be columns. In our data the patients are columns and the genes are rows so we have to **transpose the matrix** with the t() function. 
+The code for the **PCA** requires the samples (patients) to be in the rows and the genes to be in the columns. In our data the patients are columns and the genes are rows so we have to **transpose the matrix** with the t() function. 
 
 ```{r}
 pca_M <- prcomp(t(M_genes))
@@ -291,23 +293,22 @@ pca_M <- prcomp(t(M_genes))
 
 ####How much variation does each component account for?
 
-To decide, how much principal components we want to work with, we have to know how much variation each principal component accounts for in percentage. We plot the percentage for each component and decide with the "elbow method" with which number of components we have to work with. 
-
+In order to have a better overview on the obtained principal components, we study how much variation in percentage each principal component accounts for. We plot the percentage for each component and decide with the "elbow method" with how many PC we have to work with. 
+ 
 ```{r}
 var_pca <- pca_M$sdev^2
 var_pca_per <- round(var_pca/sum(var_pca)*100, 1)
 plot(var_pca_per, main="Variation of our data", xlab="Principal Components", ylab="Percent Variation", ylim=c(0,25),type = "o", pch=20)
 ```
 
-In the plot we can not see an elbow so we would actually have to work on with ten principal components. But as the last PCs don't explain much variation anyway and are therefor useless for us, we investigate on the first five PCs.
-
+In the plot we can not see a significant elbow. Based on the visualization, we would actually have to continue the downstream analysis with ten principal components. But as the last PCs don't explain much variation anyway and are therefore useless for us, we continue the analysis on the first five PCs.
 
 
 ####Drawing a 2D plot of component 1 and 2
 
-To check whether we have a batch effect, we plot principal component 1 against principle component 2. 
+First, we check whether the control and disease sample separate into two separate groups based on the first principal components. Therefore, we plot principal component 1 against principle component 2. 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(ggplot2)
 
 pca_values <- data.frame(Sample=rownames(pca_M$x),
@@ -326,8 +327,8 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
 ###Investigation for batch effect 
 
 Now we use different categories of the annotation table which possibly might cause **batch effect** and divide them by colour and shape in our graph of principal component 1 and 2.
-Batch effect is a **technical source of error**, which could have been added to the samples by e.g. gender. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
-To avoid errors, we used three tests to see whether there is a batch effect in a principal component or not.
+Batch effect is a **technical source of error**. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
+
 
 ```{r}
 ggplot_1 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
@@ -367,7 +368,7 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 
 ####Checking our PC 1 to 5 for significant batch effect per category 
 
-To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the category of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
+To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the categories of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
 For numbers we use the **permutation test** (of Pearson's r correlation coefficient), for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
 
 ```{r}
@@ -381,7 +382,7 @@ batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 
 ####Permutation test for numbers
 
-The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counterhypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
+The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counter hypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
 
 ```{r}
 cor.perm <- function (x, y, nperm = 1000)
@@ -503,7 +504,7 @@ p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.val
 ```
 
 
-We create a data frame containing **all p values of the categories** we investigate for a batch effect.
+We create a data frame containing **all p values of the categories** obtained.
 
 ```{r}
 p_DISEASE_t <- as.data.frame(t(p_DISEASE))
@@ -516,7 +517,7 @@ total_pvalue <- cbind(p_DISEASE_t,p_BIOMATERIAL_PROVIDER_t,p_Predicted.Gender_t,
 ```
 
 
-We give columns and rows informative names.
+We give to the columns and rows informative names.
 
 ```{r}
 names(total_pvalue)[1] <- "p_DISEASE"
@@ -537,7 +538,7 @@ rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <-
 ####Preparation for heatmap 
 
 To **decide which PC we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
-For analyzing and comparing all p-values we state all p-values under 0.1 as significant. To make visualization easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
+For analyzing and comparing all p-values we choose as threshold for significancy 0.1 because this is a common threshold applied in statistical tests. To make visualization easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
 
 ```{r}
 
@@ -558,7 +559,7 @@ for (i in 1:ncol(total_pvalue)){
 
 ####Heatmap 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(gplots)
 
 par(cex.main = 1)
@@ -584,12 +585,12 @@ par(cex.main = 1)
 ```
 
 
-By looking at the heatmap or at the p-values one can see that principal component 1 has a batch effect.
+By looking at the heatmap or at the p-values one can see that principal component 1 has batch effect: sample desc and biomaterial provider. 
 Therefore **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
 
 ####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
 
-Now we want to **find the most important genes** which means that we want to find the genes which have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
+Now we want to compute feature selection, which means that we want **find the most important genes** for our analysis. We decide to select the genes that have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
 
 ```{r}
 loading_scores <- pca_M$rotation[,2]
@@ -601,18 +602,18 @@ genes_top_2000 <- names(ranked_gene_score[1:2000])
 
 ####Look for elbow in top gene variance
 
-Now we want to **decide how many genes we want to keep for our further analysis** by looking for an elbow in the plot of loading scores. 
+Now we want to **decide how many genes we want to keep for further analysis** by looking for an elbow in the plot of loading scores. 
 
 ```{r}
 plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
 ```
 
-Actually there is a kink in the elbow plot of loading scores of the genes at round about 2000 genes. K-means clustering already worked with 2000 genes but by using only 2000 genes we get only 3 significant different methylated genes, which is not sufficient. By using 10000 genes we get 24 differentially methylated genes, which is an amount which we can work with. 
+Actually there is a kink in the elbow plot of loading scores of the genes at round about 2000 genes. K-means clustering already worked with 2000 genes but by using only 2000 genes we get only 3 significant different methylated genes, which is not as many as expected. By using 10000 genes we get 24 differentially methylated genes, which is an amount easier to work with. 
 
 
 ##4) Clustering with k-means
 
-K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repitition of steps with the aim of finding the right cluster for each datapoint. First step is the clustering which means that the datapoints get split up into k clusters. Each datapoint gets alloted to its next clusterpoint. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as set in the code. By performing k-means clustering we want to **check whether sick and healthy patients are separated in two different clusters.** Therefor we first create two dataframes containing all M-values from the 2000 and 10000 most important genes for principal component 2.
+K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repetition of steps with the aim of finding the right cluster for each datapoint. In the first step the datapoints are split into k clusters (k chosen by the user). Each datapoint is assigned to one of the k clusters. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as no datapoint change the belonging cluster. By performing k-means clustering we want to **check whether sick and healthy patients are separated in two different clusters.** Therefore we first create two dataframes containing all M-values from the 2000 and 10000 most important genes for principal component 2.
 
 ```{r}
 k_means_data2 <- M_genes[genes_top_2000,]
@@ -638,7 +639,7 @@ One can see that our sick and healthy patients belong to two different clusters 
 
 ###Student's t-test
 
-To see whether the methylation differences, so differences in M-values, between the two Sample groups are significant, **a student t-test is performed**. It can be used, because due to normalisation the varaiance of the values are equal now. The test compares the mean M-value of sick patients to the mean M-value of healthy patients and gives a p-value, which is significant or not depending on how strict is the threshold you set.
+To see whether the methylation differences, so differences in M-values, between the two Sample groups are significant, **a student t-test is performed**. It can be used because due to the normalisation computed the variances of the values are equal. The test compares the mean M-value of sick patients to the mean M-value of healthy patients and gives a p-value, which is significant or not depending on how strict is the threshold you set.
 
 ```{r}
 cluster <- k[["cluster"]]
@@ -668,7 +669,7 @@ rownames(p_combined) <- row_names
 
 ###Correction of p values by using the holm method
 
-To reduce the family-wise error rate, which is the propability of getting one ore more type 1 errors (also called false positive error), the *holm method* is used. Besides a *dataframe* containing the uncorrected p-values and the corrected p-values in rising order and the belonging gene ID and symbol is created.
+P values are corrected for multiple comparisons. The *holm correction* is applied. Additionally, a *dataframe* containing the uncorrected p-values and the corrected p-values in rising order and the belonging gene ID and symbol is created.
 
 ```{r}
 p_combined$p_adjusted = p.adjust(p_combined$p_value, method = "holm")
@@ -684,7 +685,7 @@ holm_new <- holm[order(holm$p_value),]
 
 #### Significant different methylated genes
 
-The p-values from the t-test were corrected with the holm method. 24 genes had a p-value under 0.1. Because of that we defined this genes of healthy patients as significantly differently methylated than the ones of sick patients.
+The p-values from the t-test were corrected with the holm method. 24 genes had a p-value under 0.1 (threshold chose for significancy). Because of that, we defined this genes of as significantly differently methylated between healtht and sick patients.
 The most differently methylated gene is MIR-941-1. It is a gene for a microRNA (non-coding and short RNA) that plays a role in the transcriptional regulation of gene expression. MicroRNAs have an influence on stability and translation of mRNAs by being a part of the RNA induced silencing complex (RISC). RISC can bind mRNAs complementary to its miRNA or siRNA. This can either inhibit or destabilize the mRNA, so that less or no proteins coded by the mRNA get produced. MIR-941-1 is known to be transcriptionally silenced in gastric cancer cells which fits to our results. Other differently methylated genes in our dataset which are coding for miRNAs were MIR3687-1, MIR1915, MIR8075, MIR941-2, MIR941-3, MIR941-4 and MIR647. 
 Another group of differently methylated genes play a role in splicing. Three of the 24 tested genes coded for the U6 subunit of the spliceosome, namely RNU6-481P, RNU6-638P and RNU6-1237P. Splicing is part of the processing of the mRNA in eukaryotes which makes it very important for the protein activity. Also, we found out that RNU7-116P is differently methylated. RNU7-116P codes for a U7 small nuclear ribonucleoprotein which is used for histone RNA processing. Both the U6 and U7 subunit both play a part in transcriptional regulation. Due to this regulation, proteins can be differently expressed which might lead to cancer development.
 
@@ -783,7 +784,7 @@ A vulcano plot can help visualising whether a gene is claimed to be differently 
 
 ####Fold change calculation
 
-On the x-axis of the volcano plot there is the **difference of the beta-value means of each sample group**. This is the axis showing the biological relevance. Usually for better visualization you use the log2 fold change of the M-values. Due to the negative M-values that exist, this is mathematically not possible. Therefor we do not use the log2 fold change of the M-values, but the one of the beta-values.
+On the x-axis of the volcano plot there is the **difference of the beta-value means of each sample group**. This is the axis showing the biological relevance. Usually for better visualization you use the log2 fold change of the M-values. Due to the negative M-values that exist, this is mathematically not possible. Therefore we do not use the log2 fold change of the M-values, but the one of the beta-values.
 
 
 ```{r}
@@ -798,7 +799,7 @@ fold = control_mean - tumor_mean
 
 ####Visualisation including information about hyper- and hypomethylation 
 
-Also on the y-axis we have to improvise: The y-axis shows the p-values and therefor the statistical relevance. Actually the corrected p-values should be used, but somehow a lot of p-values were corrected to the value 1, which distorts the plot. Therefor we use the uncorrected p-values for the y-axis and **create a volcano plot**
+The y-axis shows the p-values and therefore the statistical relevance. Actually the corrected p-values should be used, but somehow a lot of p-values were corrected to the value 1, which distorts the plot. Therefor we use the uncorrected p-values for the y-axis and **create a volcano plot**
 
 ```{r}
 plot(fold, -log10(p_value), ylim = c(0,3))
@@ -835,7 +836,7 @@ points (fold[filter_combined & fold > 0],
 
 ####Hyper- and hypomethylation in relevant genes
 
-We have had created a dataframe `relevant_genes` containing the genes which show significant differences in methylation and four genes, which do not show significant methylation differences between sick and healthy, but seem to be worth a look, because we read about them in literature before. But to know wether those genes in cancer patients are hyper or hypomethylated we need to have a look at the fold value. Therefor we **add the fold values to the relevant genes**.
+We have had created a dataframe `relevant_genes` containing the genes which show significant differences in methylation and four genes, which do not show significant methylation differences between sick and healthy, but seem to be worth a look, because we read about them in literature before. But to know whether those genes in cancer patients are hyper or hypomethylated we need to have a look at the fold value. Therefore we **add the fold values to the relevant genes**.
 Genes in cancer patients are **upmethylated** if the **fold is negative** and the absolute fold higher than 0.05.
 And Genes are **downmethylated** if the **fold is positiv** and the absolute fold higher than 0.05.
 
@@ -850,7 +851,7 @@ print(relevant_genes)
 
 Logistic regression is used to model the relationship between a binary outcome variable and one or more predictor variables. In this case, the predictor variables are methylation data of the genes and the outcome is either healthy or sick. Hence we want to **predict a patient's health status by the methylation status of their genes**.
 
-We create a dataframe, which contains M values and health status of 7 random patients. Therefore, the M value dataframe needs to be transformed first. We then add the patients' health status. This data frame is used for generating the logistic regression model. We then do cross validation by applying the regression model to the test set data frame and by checking whether the predicted and actual health status match, we can see if the regression model makes works.
+We create a dataframe, which contains M values and health status of 7 random patients. Therefore, the M value dataframe needs to be transformed first. We then add the patients health status. This data frame is used for generating the logistic regression model. We then do cross validation by applying the regression model to a test set data frame and by checking whether the predicted and actual health status match, we can see if the regression model makes works.
 
 ```{r}
 log_regression <- k_means_data[,c(1,2,4,5,8,9,10)]
@@ -870,9 +871,9 @@ summary_regression_model <- summary(regression_model)
 summary_regression_model$coefficients
 ```
 
-We only get estimate values for the genes shown above whereas the values for the remainig genes are NA and therefore not shown in the table. This is because of multicollinearity, which means that one or more predictor variables are highly correlated and consequently do not contribute to the regression model.
-The estimate value explains the influence of the predictor variable on the outcome variable. Positive values indicate that a gene contributes to health whereas genes with negative values promote disease.
-It is notable that we get high standard errors, which implies that the regression model is not very reliable. These high standard error values result from mulitcollinearity.
+We only get estimate values for the genes shown above whereas the values for the remainig genes are NA and therefore not shown in the table. This is because of multicollinearity, which means that one or more predictor variables are highly correlated.
+The estimated value explains the influence of the predictor variable on the outcome variable. Positive values indicate that a gene contributes to health whereas genes with negative values promote disease.
+It is notable that we get high standard errors, which implies that the regression model is not very reliable. These high standard error values probably result from mulitcollinearity.
 
 ```{r}
 prediction <- predict(regression_model, newdata = test_set, type = "response")
@@ -880,8 +881,8 @@ prediction
 levels(train_set$healthstatus_regression)
 ```
 
-Since we only have very few data available, the prediction of the logistic regression model based on the train set containing 70% of our data does not correspond with the actual health status. Even though the predicted probability is 10^6 times higher for the healthy patient than for the ones with CLL, it is still very close to 0, which implies that the patient is probably sick.
-Therefore we use all data available to model logistic regression without performing cross validation.
+Since we only have very few sample available, the prediction of the logistic regression model based on the train set containing 70% of our data does not correspond with the actual health status. Even though the predicted probability is 10^6 times higher for the healthy patient than for the ones with CLL, it is still very close to 0, which implies that the patient is probably sick.
+Therefore we use all data available to model logistic regression without performing cross validation. In this way, more samples are available to train the model. 
 
 ```{r}
 k_means_data_no_cv <- t(k_means_data)
