@@ -681,7 +681,15 @@ holm_new <- holm[order(holm$p_value),]
 
 ###Finding DMRs
 
-Only 24 genes are significantly differently methylated using a threshold of a corrected p-value of  0,1.
+#### Significant different methylated genes
+
+The p-values from the t-test were corrected with the holm method. 24 genes had a p-value under 0.1. Because of that we defined this genes of healthy patients as significantly differently methylated than the ones of sick patients.
+The most differently methylated gene is MIR-941-1. It is a gene for a microRNA (non-coding and short RNA) that plays a role in the transcriptional regulation of gene expression. MicroRNAs have an influence on stability and translation of mRNAs by being a part of the RNA induced silencing complex (RISC). RISC can bind mRNAs complementary to its miRNA or siRNA. This can either inhibit or destabilize the mRNA, so that less or no proteins coded by the mRNA get produced. MIR-941-1 is known to be transcriptionally silenced in gastric cancer cells which fits to our results. Other differently methylated genes in our dataset which are coding for miRNAs were MIR3687-1, MIR1915, MIR8075, MIR941-2, MIR941-3, MIR941-4 and MIR647. 
+Another group of differently methylated genes play a role in splicing. Three of the 24 tested genes coded for the U6 subunit of the spliceosome, namely RNU6-481P, RNU6-638P and RNU6-1237P. Splicing is part of the processing of the mRNA in eukaryotes which makes it very important for the protein activity. Also, we found out that RNU7-116P is differently methylated. RNU7-116P codes for a U7 small nuclear ribonucleoprotein which is used for histone RNA processing. Both the U6 and U7 subunit both play a part in transcriptional regulation. Due to this regulation, proteins can be differently expressed which might lead to cancer development.
+
+
+#### Genes we found in literature which are not significant different nethylated
+
 Besides there have been genes, often correlated to CLL, which we found in literature before.
 **Literature genes**, which we also found in our initial dataset `genes` are those ones.
 
@@ -726,13 +734,14 @@ Those ones still existing in the dataframe after the t-test and the 24 significa
 relevant_genes1 <- holm_new[c(1:24),]
 relevant_genes2 <- holm_new[c("ENSG00000048462","ENSG00000159958","ENSG00000232810","ENSG00000233125"),]
 relevant_genes <- rbind(relevant_genes1,relevant_genes2)
+print(relevant_genes)
 ```
 
 ###Some additional information to our genes out of the literature
 
 #### Gene number one: ACTBP12
 
-ACTBP12 is just a pseudogene with no specific function. As the gene out of our literature analysis was named ???CTBP2??? and not ???ACTBP12???, this is not surprising. Still we wanted to see, whether there is a relation between these genes.
+ACTBP12 is just a pseudogene with no specific function. As the gene out of our literature analysis was named âCTBP2â and not âACTBP12â, this is not surprising. Still we wanted to see, whether there is a relation between these genes.
 
 #### Gene number two: TNF
 
@@ -766,7 +775,6 @@ Rickert, R.C., Jellusova, J., and Miletic, A.V. (2011). Signaling by the tumor n
 Mackay, F., Figgett, W.A., Saulep, D., Lepage, M., and Hibbs, M.L. (2010). B-cell stage and context-dependent requirements for survival signals from BAFF and the B-cell receptor. Immunological reviews 237, 205-225.
 
 RefSeq, Jul 2008
-
 
 ###Statistical and biological relevant methylation differences in genes
 
