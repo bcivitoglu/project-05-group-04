@@ -3,9 +3,9 @@ title: "Cancer methylome analysis CLL vs. B-Cells"
 author: "Leona Brandl, Carlotta Brueggen, Tim Kuehn, Violetta Schaaf"
 date: "17th July 2019"
 output:
-  word_document: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  word_document: default
 ---
 
 
@@ -329,6 +329,9 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
 Now we use different categories of the annotation table which possibly might cause **batch effect** and divide them by colour and shape in our graph of principal component 1 and 2.
 Batch effect is a **technical source of error**. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
 
+At first we investigated for a possible batch effect by looking at the categories gender, sample desc, biomaterial provider and age. As age is not a perfect example of batch effect, [...] it is not further investigated.
+You may be able to guess the batch effect by taking a look at the degree of separation. If all the data points of one variable are close to each other and they are not well separated by the principal component, this could indicate a batch effect in the respective components.  
+
 
 ```{r}
 ggplot_1 <- ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
@@ -368,7 +371,7 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 
 ####Checking our PC 1 to 5 for significant batch effect per category 
 
-To verify our observations, we want to test if batch effect of the different categories is significant for PC 1-5. Therefore, we first create three dataframes containing PC 1-5 and the categories of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
+To verify our observations, we want to test if batch effect of the different categories is significant for the first five principal components. Therefore, we first create three dataframes containing PC 1-5 and the categories of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
 For numbers we use the **permutation test** (of Pearson's r correlation coefficient), for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
 
 ```{r}
