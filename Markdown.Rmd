@@ -689,6 +689,11 @@ The p-values from the t-test were corrected with the holm method. 24 genes had a
 The most differently methylated gene is MIR-941-1. It is a gene for a microRNA (non-coding and short RNA) that plays a role in the transcriptional regulation of gene expression. MicroRNAs have an influence on stability and translation of mRNAs by being a part of the RNA induced silencing complex (RISC). RISC can bind mRNAs complementary to its miRNA or siRNA. This can either inhibit or destabilize the mRNA, so that less or no proteins coded by the mRNA get produced. MIR-941-1 is known to be transcriptionally silenced in gastric cancer cells which fits to our results. Other differently methylated genes in our dataset which are coding for miRNAs were MIR3687-1, MIR1915, MIR8075, MIR941-2, MIR941-3, MIR941-4 and MIR647. 
 Another group of differently methylated genes play a role in splicing. Three of the 24 tested genes coded for the U6 subunit of the spliceosome, namely RNU6-481P, RNU6-638P and RNU6-1237P. Splicing is part of the processing of the mRNA in eukaryotes which makes it very important for the protein activity. Also, we found out that RNU7-116P is differently methylated. RNU7-116P codes for a U7 small nuclear ribonucleoprotein which is used for histone RNA processing. Both the U6 and U7 subunit both play a part in transcriptional regulation. Due to this regulation, proteins can be differently expressed which might lead to cancer development.
 
+Sources:
+
+(Kim et al., 2014)
+(Mannoor et al., 2012)
+(Stefanovic et al., 1995)
 
 #### Genes we found in literature which are not significant different nethylated
 
@@ -765,18 +770,19 @@ Sources to TNFRSF13C:
 
 The protein encoded by the gene tumor necrosis factor receptor superfamily member 17 (TNFRSF17) gene is a member of the TNF-receptor superfamily. It is a receptor, especially expressed in mature B lymphocytes and might play a role in B cell development. It leads to NF-kappaB and MAPK8/JNK activation and therefore it binds to different TRAF family members. It might transduce signals for cell survival and proliferation.
 
-Sources to TNFRSF17:
-RefSeq, Jul 2008
- 
-####Sources in general:
+####Sources in general for the DMRs:
+
+Kim, J.G., Kim, T.O., Bae, J.H., Shim, J.W., Kang, M.J., Yang, K., Ting, A.H., and Yi, J.M. (2014). Epigenetically regulated MIR941 and MIR1247 target gastric cancer cell growth and migration. Epigenetics 9, 1018-1030.
+
+Mannoor K, Liao J, Jiang F. Small nucleolar RNAs in cancer. Biochim Biophys Acta. 2012;1826(1):121–128. doi:10.1016/j.bbcan.2012.03.005
+
+Stefanovic B, Wittop Koning TH, Schümperli D. A synthetic histone pre-mRNA-U7 small nuclear RNA chimera undergoing cis cleavage in the cytoplasm of Xenopus oocytes. Nucleic Acids Res. 1995;23(16):3152–3160. doi:10.1093/nar/23.16.3152
 
 Gravestein, L.A., and Borst, J. (1998). Tumor necrosis factor receptor family members in the immune system. Seminars in Immunology 10, 423-434.
 
 Rickert, R.C., Jellusova, J., and Miletic, A.V. (2011). Signaling by the tumor necrosis factor receptor superfamily in B-cell biology and disease. Immunological reviews 244, 115-133.
 
 Mackay, F., Figgett, W.A., Saulep, D., Lepage, M., and Hibbs, M.L. (2010). B-cell stage and context-dependent requirements for survival signals from BAFF and the B-cell receptor. Immunological reviews 237, 205-225.
-
-RefSeq, Jul 2008
 
 ###Statistical and biological relevant methylation differences in genes
 
