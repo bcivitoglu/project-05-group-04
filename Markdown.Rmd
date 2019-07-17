@@ -324,13 +324,15 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
 
 
 
-###Investigation for batch effect 
+###Investigation for batch effect
 
-Now we use different categories of the annotation table which possibly might cause **batch effect** and divide them by colour and shape in our graph of principal component 1 and 2.
-Batch effect is a **technical source of error**. It is important that the technical variation does not confound with the biology to not falsify the interpreted data.
+Using different categories of the annotation tbale makes it possible to check for a possible **batch effect**. Batch effect is a **technical source of error**. It is important that the technical variation does not confound with the biology to not falsify the interpreted data. Therfore it is important to check for a batch effect to see whether the variance explained by the principal components is related to technical error or by biological influence.
 
-At first we investigated for a possible batch effect by looking at the categories gender, sample desc, biomaterial provider and age. As age is not a perfect example of batch effect, [...] it is not further investigated.
-You may be able to guess the batch effect by taking a look at the degree of separation. If all the data points of one variable are close to each other and they are not well separated by the principal component, this could indicate a batch effect in the respective components.  
+We check for a batch effect to see whether the variance our PC explains Is related to technical error or biological influence 
+
+First, principal components one and two were examined for the batch effect by distinguishing different categories by different colors and shapes. The categories to be examined were "gender", "sample desc", "biomaterial provider" and "age". However, the age is to be viewed critically, since depending on the age, different levels of methylation may be present and could mistakenly be taken as a batch effect, although it is a biological origin.
+
+By plotting PC one and two with the mentioned categories, it is possible to visually investigate for possible batch effects. If all data points of one variable are close to each other and they are not well separated by the principal component, this could indicate a batch effect in the respective components.  
 
 
 ```{r}
@@ -371,8 +373,11 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 
 ####Checking our PC 1 to 5 for significant batch effect per category 
 
-To verify our observations, we want to test if batch effect of the different categories is significant for the first five principal components. Therefore, we first create three dataframes containing PC 1-5 and the categories of the annotation table we want to investigate, depending on the properties of the data, because we need to perform different tests for different data types.
-For numbers we use the **permutation test** (of Pearson's r correlation coefficient), for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
+To verify the observations, as visualisation is not an objective way to interprete data, it is important to test if batch effect of different categories is significant for the first five principal components, as they explain most of the data´s variance.
+Therefore, it is necessary to create three dataframes containing PC 1-5 and the categories of the annotation table which want to be investigated. Three dataframes are needed because different tests are performed for different data types. 
+
+For numbers the **permutation test** (of Pearson's r correlation coefficient) is used, for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
+
 
 ```{r}
 x <- pca_M[["x"]]
@@ -385,7 +390,11 @@ batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 
 ####Permutation test for numbers
 
-The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counter hypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers. 
+The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counter hypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers.
+
+The **permutation test** is used for "SEQ_RUNS_COUNT", because numbers have to be examined.
+
+CODE ERKLÄREN
 
 ```{r}
 cor.perm <- function (x, y, nperm = 1000)
@@ -423,11 +432,9 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 
 ####Wilcoxon test for 2 categories
 
-The **Wilcoxon test** for dependent spot checks tests, whether the central tendencies are different. "Dependent spot checks" is used if one measurement in a sample and one measurement in another sample influence each other. In three situations this is the case:
-1) Repeated measures
-2) Natural pairs
-3) Matching
-Basically it is possible to check for a batch effect with two categories only.
+Categories "BIOMATERIAL_PROVIDER", "DISEASE" and "Predicted.Gender" were tested for a possible batch effect by using the **Wilcoxon test**, as there are exactly two different results.
+
+CODE ERKLÄREN
 
 ```{r}
 pc_1_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
@@ -473,8 +480,9 @@ p_Predicted.Gender <- data.frame(pc_1_Predicted.Gender, pc_2_Predicted.Gender, p
 
 ####Kruskal-Wallis for several categories
 
-The **Kurskal-Wallis test** checks, whether there is a difference in central tendencies between several independent spot checks. The test is used, if the prerequisites for a parametric method is not fulfilled. One of the benefits of the test is that the data does not have to be normally distributed. On the other hand, the test can also be calculated for small samples and outliers.
-Basically it is possible to check for a batch effect with several categories.
+Category "sample_desc_3" is invesigated by **Kruskal-wallis test** as it has three different non-numeric resultst.
+
+CODE ERKLÄREN
 
 ```{r}
 batch_kruskal <- within(batch_kruskal, {
@@ -591,6 +599,8 @@ par(cex.main = 1)
 By looking at the heatmap or at the p-values one can see that principal component 1 has batch effect: sample desc and biomaterial provider. 
 Therefore **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
 
+###Feature selection
+
 ####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
 
 Now we want to compute feature selection, which means that we want **find the most important genes** for our analysis. We decide to select the genes that have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
@@ -616,7 +626,7 @@ Actually there is a kink in the elbow plot of loading scores of the genes at rou
 
 ##4) Clustering with k-means
 
-K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repetition of steps with the aim of finding the right cluster for each datapoint. In the first step the datapoints are split into k clusters (k chosen by the user). Each datapoint is assigned to one of the k clusters. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as no datapoint change the belonging cluster. By performing k-means clustering we want to **check whether sick and healthy patients are separated in two different clusters.** Therefore we first create two dataframes containing all M-values from the 2000 and 10000 most important genes for principal component 2.
+K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repetition of steps with the aim of finding the right cluster for each datapoint. In the first step the datapoints are split into k clusters (k chosen by the user). Each datapoint is assigned to one of the k clusters. In this dataframe, two centers are selected, as the outcome of sick and healthy is expected. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as no datapoint change the belonging cluster. By performing k-means clustering it is possible to **check whether sick and healthy patients are separated in two different clusters**.(???????????????) For this two data sets with the M values of the 2000 and 10000 most important genes from PC2 have to be generated.
 
 ```{r}
 k_means_data2 <- M_genes[genes_top_2000,]
@@ -634,7 +644,7 @@ cluster <- data.frame(k[["cluster"]])
 cluster
 ```
 
-One can see that our sick and healthy patients belong to two different clusters so we can use principal component two for further testing.
+One can see that the sick and healthy patients belong to two different clusters so it is possible to use principal component two for further testing.
 
 
 
