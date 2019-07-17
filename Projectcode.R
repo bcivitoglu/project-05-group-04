@@ -728,6 +728,11 @@ points (fold[filter_combined & fold > 0],
         -log10(p_value[filter_combined & fold > 0]),
         pch = 16, col = "blue")
 
+#Add fold to the relevant genes dataframe to see wether upmethylated (fold < 0 and abs fold >1) or downmethylated (fold > 0 and abs fold > 1)
+fold <- data.frame(fold)
+fold2 <- as.data.frame(fold[rownames(relevant_genes),])
+relevant_genes <- cbind(relevant_genes, "fold" = fold2$fold)
+
 #logistic regression
 ##We create a dataframe, which contains M values and healthstatus of 7 random patients. Therefor the M value dataframe needs to be transformed first.
 

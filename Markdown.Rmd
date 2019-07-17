@@ -726,14 +726,13 @@ Those ones still existing in the dataframe after the t-test and the 24 significa
 relevant_genes1 <- holm_new[c(1:24),]
 relevant_genes2 <- holm_new[c("ENSG00000048462","ENSG00000159958","ENSG00000232810","ENSG00000233125"),]
 relevant_genes <- rbind(relevant_genes1,relevant_genes2)
-print(relevant_genes)
 ```
 
 ###Some additional information to our genes out of the literature
 
 #### Gene number one: ACTBP12
 
-ACTBP12 is just a pseudogene with no specific function. As the gene out of our literature analysis was named “CTBP2” and not “ACTBP12”, this is not surprising. Still we wanted to see, whether there is a relation between these genes.
+ACTBP12 is just a pseudogene with no specific function. As the gene out of our literature analysis was named ???CTBP2??? and not ???ACTBP12???, this is not surprising. Still we wanted to see, whether there is a relation between these genes.
 
 #### Gene number two: TNF
 
@@ -824,6 +823,19 @@ points (fold[filter_combined & fold > 0],
         pch = 16, col = "blue")
 ```
 
+
+####Hyper- and hypomethylation in relevant genes
+
+We have had created a dataframe `relevant_genes` containing the genes which show significant differences in methylation and four genes, which do not show significant methylation differences between sick and healthy, but seem to be worth a look, because we read about them in literature before. But to know wether those genes in cancer patients are hyper or hypomethylated we need to have a look at the fold value. Therefor we **add the fold values to the relevant genes**.
+Genes in cancer patients are **upmethylated** if the **fold is negative** and the absolute fold higher than 1.
+And Genes are **downmethylated** if the **fold is positiv** and the absolute fold higher than 1.
+
+``` {r}
+fold <- data.frame(fold)
+fold2 <- as.data.frame(fold[rownames(relevant_genes),])
+relevant_genes <- cbind(relevant_genes, "fold" = fold2$fold)
+print(relevant_genes)
+```
 
 ##6) Logistic regression
 
