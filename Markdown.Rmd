@@ -605,8 +605,13 @@ par(cex.main = 1)
 ```
 
 
-By looking at the heatmap or at the p-values one can see that principal component 1 has batch effect: sample desc and biomaterial provider. 
-Therefore **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
+By looking at the heatmap or at the p-values one can see that principal component 1 has batch effect for the categories "sample desc" and "biomaterial provider".
+
+To sum it up: Principal component one in general explains more variance than principal component two (Chapter 2: Normalisation). However, the heatmap shows that part of the variance must come from the batch effect and not from dividing the two patient groups in sick and healthy.
+Looking at the heatmap shows that principal component one shows batch effect for three categories, or two categories of investigation and a category of controll respectively.
+The two important categories are "sample desc" and "biomaterial provider", and the controll category is "disease". A signigicant difference in the first two categories is not good for the principal component, as it is not clear how much of the variance really is explainable by batch effect or a biological difference. On the other hand, the significance for "disease", as indicated in the heatmap, is a good sign, as this is a controll category and should show significance, since it separates the data according to the criterion which is searched for.
+Principal component two explains most variance except of component one. By having a look at the heatmap, it shows no significance at all, which is a good sign for the investigated categories, but not for the category of controll respecitvely.
+Since it is not known how much of the explained variance was caused by the batch effect and not due to biological abuse, **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
 
 ###Feature selection
 
@@ -635,7 +640,8 @@ Actually there is a kink in the elbow plot of loading scores of the genes at rou
 
 ##4) Clustering with k-means
 
-K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repetition of steps with the aim of finding the right cluster for each datapoint. In the first step the datapoints are split into k clusters (k chosen by the user). Each datapoint is assigned to one of the k clusters. In this dataframe, two centers are selected, as the outcome of sick and healthy is expected. Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as no datapoint change the belonging cluster. By performing k-means clustering it is possible to **check whether sick and healthy patients are separated in two different clusters**.(???????????????) For this two data sets with the M values of the 2000 and 10000 most important genes from PC2 have to be generated.
+K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repetition of steps with the aim of finding the right cluster for each datapoint. In the first step the datapoints are split into k clusters (k chosen by the user). Each datapoint is assigned to one of the k clusters. In this dataframe, two centers are selected, as the outcome of sick and healthy is expected. If it was not clear how many centers make sense, an elbow plot could give you an idea.
+Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as no datapoint change the belonging cluster. By performing k-means clustering it is possible to **check whether sick and healthy patients are separated in two different clusters**. For this two data sets with the M values of the 2000 and 10000 most important genes from PC2 have to be generated.
 
 ```{r}
 k_means_data2 <- M_genes[genes_top_2000,]
