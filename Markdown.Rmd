@@ -91,7 +91,16 @@ A **data frame only containing coverage values** is created.
 cov_genes <- genes[,c(1,21:30)]
 ```
 
-At this point we already delete some genes, which are the genes on the X- and Y-chromosome. Somehow there must have been problems in obtaining the beta and coverage values for those chromosomes, because the beta-values are either not a number (NaN) or mainly 1.000, which must definitely be a mistake.The belonging coverage is in most cases 0, so we can not use those beta-values values anyway. Following code **removes the X- and Y-chromosome**. 
+At this point we already delete some genes, which are the genes on the X- and Y-chromosome. Somehow there must have been problems in obtaining the beta and coverage values for those chromosomes, because the beta-values are either not a number (NaN) or mainly 1.000, which could be caused by technical source of error. The belonging coverage is in most cases 0, so we can not use those beta-values values anyway. 
+More likely, the X-chromosome has to be removed due to the fact of its inactivation in women. Since only one X chromosome is allowed to be active in women, as otherwise it could lead to complications, one must be inactivated (since women have two X chromosomes). This is done by methylation of an X chromosome and binding of an inactivating RNA. Since this methylation can not be related to possible cancer, but has a natural cause, one must remove these chromosomes out of the data.
+If the cause of the cancer were on the Y-chromosome, only men would be affected. Since this is not the case, this chromosome must also be removed from the record.
+Following code **removes the X- and Y-chromosome**.
+
+Source: (Sharp et al., 2011)
+
+Sharp, A.J., Stathaki, E., Migliavacca, E., Brahmachary, M., Montgomery, S.B., Dupre, Y., and Antonarakis, S.E. (2011). DNA methylation profiles of human active and inactive X chromosomes. Genome research 21, 1592-1600.
+
+
 
 ####Removing genes on X- and Y-chsomosome
 
