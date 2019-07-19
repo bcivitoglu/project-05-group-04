@@ -3,9 +3,9 @@ title: "Cancer methylome analysis CLL vs. B-Cells"
 author: "Leona Brandl, Carlotta Brueggen, Tim Kuehn, Violetta Schaaf"
 date: "21st July 2019"
 output: 
-  word_document: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  word_document: default
 ---
 
 
@@ -772,7 +772,7 @@ We only get estimate values for the genes shown above whereas the values for the
 The estimated value explains the influence of the predictor variable on the outcome variable. Positive values indicate that a gene contributes to health whereas genes with negative values promote disease.
 It is notable that we get high standard errors, which implies that the regression model is not very reliable. These high standard error values probably result from mulitcollinearity.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 prediction <- predict(regression_model, newdata = test_set, type = "response")
 prediction
 levels(train_set$healthstatus_regression)
@@ -781,7 +781,7 @@ levels(train_set$healthstatus_regression)
 Since we only have very few sample available, the prediction of the logistic regression model based on the train set containing 70% of our data does not correspond with the actual health status. Even though the predicted probability is 10^6 times higher for the healthy patient than for the ones with CLL, it is still very close to 0, which implies that the patient is probably sick.
 Therefore we use all data available to model logistic regression without performing cross validation. In this way, more samples are available to train the model. 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 k_means_data_no_cv <- t(k_means_data)
 k_means_data_no_cv <- data.frame(k_means_data_no_cv)
 full_data <- cbind(healthstatus, k_means_data_no_cv)
@@ -797,7 +797,7 @@ We now apply the second model to our data set.
 prediction_no_cv
 ```
 
-The predicted probability to be healthy is 1 for the healthy patients and very close to 0 for the sick patients, so it corresponds with the actual health status. This is the result we expected, since we made the prediction for the data we used to create the model.
+The predicted probability to be healthy is 1 for the healthy patients and very close to 0 for the sick patients, so it corresponds with the actual health status. This is the result we expected, since we made the prediction for the data we used to create the model, which is why the model is not reliable. Therefore, logistic regression with this dataset is not possible.
 
 
 ##7) Data evaluation
