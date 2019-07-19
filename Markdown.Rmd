@@ -3,9 +3,9 @@ title: "Cancer methylome analysis CLL vs. B-Cells"
 author: "Leona Brandl, Carlotta Brueggen, Tim Kuehn, Violetta Schaaf"
 date: "21st July 2019"
 output: 
-  html_document: default
-  pdf_document: default
   word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 
@@ -831,7 +831,7 @@ The following genes from the literature can be found in our dataset heaped, as t
 * ODC
 
 
-The **literature genes still existing in the dataframe after the t-test** are those four ones. They don't show a significant p-value, but still we will do some research on them.
+The **literature genes still existing in the dataframe after the t-test** are those four ones. They don't show a significant p-value, but still we will do some research on them in the interpretation part.
 
 ```{r}
 #grep("gene_name", holm_new$Symbols, value = TRUE)
@@ -874,33 +874,36 @@ Sources:
 (Mannoor et al., 2012)
 (Stefanovic et al., 1995)
 
-###Some additional information to our genes out of the literature
+**Some additional information to our genes out of the literature**:
 
-#### Gene number one: ACTBP12
+As already mentioned earlier in **Data evaluation**, the following genes have been identified in the literature as potential genes associated with cancer. Therefore, these genes are discussed in more detail.
 
-ACTBP12 is just a pseudogene with no specific function. As the gene out of our literature analysis was named âCTBP2â and not âACTBP12â, this is not surprising. Still we wanted to see, whether there is a relation between these genes.
+**ACTBP12**:
 
-#### Gene number two: TNF
+ACTBP12 is just a pseudogene with no specific function. As the gene out of our literature analysis was named CTBP2 and not ACTBP12, this is not surprising. Still we wanted to see, whether there is a relation between these genes.
+
+**TNF**:
 
 This gene belongs to the tumor necrosis factor (TNF) superfamily and encodes a multifunctional proinflammatory cytokine. This cytokine is mainly secreted by macrophages, which are also important for the immune system. By binding to specific receptors, this cytokine is involved in the regulation of a wide spectrum of biological processes including cell proliferation, differentiation, apoptosis, lipid metabolism, and coagulation. It is linked with a variety of diseases for example autoimmune diseases but also cancer, which is important in our case.
 These specific TNF receptors are expressed in a wide variety of tissues in mammals, especially in leucocytes which include B-cells.
 This signalling pathways, as already mentioned, is able to promote B-cell survival and proliferation.
+
 Sources to TNF: 
 (Rickert et al., 2011)
 (Gravestein and Borst, 1998)
 
-####Gene number three: TNFRSF13C
+**TNFRSF13C**:
 
 Tumor necrosis factor receptor superfamily member 13C (TNFRSF13C) is, as the name suggests, a gene which encodes for a receptor of the TNF. It is also known as B-cell-activating factor receptor (BAFF-R). In general, BAFF promotes the proliferation and differentiation of B-cells.
 
 Sources to TNFRSF13C:
 (Mackay et al., 2010)
 
-####Gene number four: TNFRSF17
+**TNFRSF17**:
 
 The protein encoded by the gene tumor necrosis factor receptor superfamily member 17 (TNFRSF17) gene is a member of the TNF-receptor superfamily. It is a receptor, especially expressed in mature B lymphocytes and might play a role in B cell development. It leads to NF-kappaB and MAPK8/JNK activation and therefore it binds to different TRAF family members. It might transduce signals for cell survival and proliferation.
 
-####Sources in general for the DMRs:
+**Sources in general for the DMRs**:
 
 Kim, J.G., Kim, T.O., Bae, J.H., Shim, J.W., Kang, M.J., Yang, K., Ting, A.H., and Yi, J.M. (2014). Epigenetically regulated MIR941 and MIR1247 target gastric cancer cell growth and migration. Epigenetics 9, 1018-1030.
 
