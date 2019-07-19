@@ -470,45 +470,14 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 
 #Wilcoxon test for 2 categories
 
-pc_1_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
-pc_2_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
-pc_3_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
-pc_4_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
-pc_5_BIOMATERIAL_PROVIDER <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.BIOMATERIAL_PROVIDER, data = batch_wilcoxon, exact = FALSE)
-
-pc_1_BIOMATERIAL_PROVIDER <- pc_1_BIOMATERIAL_PROVIDER$p.value
-pc_2_BIOMATERIAL_PROVIDER <- pc_2_BIOMATERIAL_PROVIDER$p.value
-pc_3_BIOMATERIAL_PROVIDER <- pc_3_BIOMATERIAL_PROVIDER$p.value
-pc_4_BIOMATERIAL_PROVIDER <- pc_4_BIOMATERIAL_PROVIDER$p.value
-pc_5_BIOMATERIAL_PROVIDER <- pc_5_BIOMATERIAL_PROVIDER$p.value
-
-pc_1_DISEASE <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
-pc_2_DISEASE <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
-pc_3_DISEASE <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
-pc_4_DISEASE <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
-pc_5_DISEASE <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.DISEASE, data = batch_wilcoxon, exact = FALSE)
-
-pc_1_DISEASE <- pc_1_DISEASE$p.value
-pc_2_DISEASE <- pc_2_DISEASE$p.value
-pc_3_DISEASE <- pc_3_DISEASE$p.value
-pc_4_DISEASE <- pc_4_DISEASE$p.value
-pc_5_DISEASE <- pc_5_DISEASE$p.value
-
-pc_1_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC1 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
-pc_2_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC2 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
-pc_3_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC3 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
-pc_4_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC4 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
-pc_5_Predicted.Gender <- wilcox.test(batch_wilcoxon$PC5 ~ batch_wilcoxon$annotation.Predicted.Gender, data = batch_wilcoxon, exact = FALSE)
-
-pc_1_Predicted.Gender <- pc_1_Predicted.Gender$p.value
-pc_2_Predicted.Gender <- pc_2_Predicted.Gender$p.value
-pc_3_Predicted.Gender <- pc_3_Predicted.Gender$p.value
-pc_4_Predicted.Gender <- pc_4_Predicted.Gender$p.value
-pc_5_Predicted.Gender <- pc_5_Predicted.Gender$p.value
-
-p_DISEASE <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL_PROVIDER, pc_3_BIOMATERIAL_PROVIDER, pc_4_BIOMATERIAL_PROVIDER, pc_5_BIOMATERIAL_PROVIDER)
-p_BIOMATERIAL_PROVIDER <- data.frame(pc_1_BIOMATERIAL_PROVIDER, pc_2_BIOMATERIAL_PROVIDER, pc_3_BIOMATERIAL_PROVIDER, pc_4_BIOMATERIAL_PROVIDER, pc_5_BIOMATERIAL_PROVIDER)
-p_Predicted.Gender <- data.frame(pc_1_Predicted.Gender, pc_2_Predicted.Gender, pc_3_Predicted.Gender, pc_4_Predicted.Gender, pc_5_Predicted.Gender)
+p_values_wilcoxon <- c()
+for (j in 1:5){
+  for (i in 6:8)  {
+    p_value <- wilcox.test(batch_wilcoxon[,j] ~ batch_wilcoxon[,i], data = batch_wilcoxon, exact = FALSE)$p.value
+    p_values_wilcoxon <- append(p_values_wilcoxon , p_value)
+    
+  }
+}
 
 
 #Kruskal-Wallis for several categories
@@ -549,9 +518,9 @@ p_SAMPLE_DESC_3 <- data.frame(sample_desc_3_pc1$p.value, sample_desc_3_pc2$p.val
 
 #dataframe erstellen, das alle p values der Kategorien, die wir auf einen Batch Effekt untersuchen, enth??lt
 
-p_DISEASE_t <- as.data.frame(t(p_DISEASE))
-p_BIOMATERIAL_PROVIDER_t <- as.data.frame(t(p_BIOMATERIAL_PROVIDER))
-p_Predicted.Gender_t <- as.data.frame(t(p_Predicted.Gender))
+p_DISEASE_t <- as.data.frame(p_values_wilcoxon[c(2,5,8,11,14)])
+p_BIOMATERIAL_PROVIDER_t <- as.data.frame(p_values_wilcoxon[c(1,4,7,10,13)])
+p_Predicted.Gender_t <- as.data.frame(p_values_wilcoxon[c(3,6,9,12,15)])
 p_SEQ_RUNS_COUNT_t <- as.data.frame(t(p_SEQ_RUNS_COUNT))
 p_SAMPLE_DESC_3_t <- as.data.frame(t( p_SAMPLE_DESC_3))
 
@@ -565,11 +534,11 @@ names(total_pvalue)[4] <- "p_SEQ_RUNS_COUNT"
 names(total_pvalue)[5] <- "p_SAMPLE_DESC"
 
 #rename rows
-rownames(total_pvalue)[rownames(total_pvalue) == "pc_1_BIOMATERIAL_PROVIDER"] <- "PC1"
-rownames(total_pvalue)[rownames(total_pvalue) == "pc_2_BIOMATERIAL_PROVIDER"] <- "PC2"
-rownames(total_pvalue)[rownames(total_pvalue) == "pc_3_BIOMATERIAL_PROVIDER"] <- "PC3"
-rownames(total_pvalue)[rownames(total_pvalue) == "pc_4_BIOMATERIAL_PROVIDER"] <- "PC4"
-rownames(total_pvalue)[rownames(total_pvalue) == "pc_5_BIOMATERIAL_PROVIDER"] <- "PC5"
+rownames(total_pvalue)[rownames(total_pvalue) == "p_PC1_SEQ.P.per"] <- "PC1"
+rownames(total_pvalue)[rownames(total_pvalue) == "p_PC2_SEQ.P.per"] <- "PC2"
+rownames(total_pvalue)[rownames(total_pvalue) == "p_PC3_SEQ.P.per"] <- "PC3"
+rownames(total_pvalue)[rownames(total_pvalue) == "p_PC4_SEQ.P.per"] <- "PC4"
+rownames(total_pvalue)[rownames(total_pvalue) == "p_PC5_SEQ.P.per"] <- "PC5"
 
 #transform dataframe into a matrix
 total_pvalue <- data.matrix(total_pvalue)
