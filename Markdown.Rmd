@@ -75,8 +75,7 @@ tiling <- input_data$tiling
 Those subgroups datasets contain methylation data for different regions on the genome:
 `genes`, `promoters` and `cpgislands`contain genome segments with specific functions and methylation features. Genes, especially highly expressed genes, sometimes show methylation in their gene body. Unfortunately the biological function behind this is not fully clear yet. Still it can be interesting investigating in their methylation pattern in terms of cancer. In promoters  we already know that methylation plays an important role, because as promoters are the starting point for transcription, their methylation can silence genes laying downstream of these promoters. This way for example tumor suppresor genes don't get expressed any more, which can lead to cancer. Here we expect to find crucial differences in methylation between sick and healthy cells. CpG islands also are important regions on the DNA with a high density of cytosines in neighbourhood to guanines. These CpG islands are often in promoter regions of housekeeping genes and in healthy beeings only rarely methylated, because their methylation usually leads to mistakes in replication and transcription and quickly in death just because functioning promoters are so essential in those genes. Also in those CpG islands a loss of function can lead to cancer, so we expect significant methylation differences. The fourth subgroup is `tiling` which describes a specific section on the genome in steps of 5000 nucleotides without a biological context.
 
-As we want to analyse those subgroups separatly, we first just choose one subgroup, `genes`, 
-to work on our code. Later we can transfer the code on the other subgroups, too.
+As we found genes influencing the formation of CLL in papers, which we wil mention later on, we will concentrate on the subgroup `genes` 
 In this `genes`dataset we **rename the columns**, which stand for different patients (patient 1 to patient 10). They get short precise names to let the reader get the meaning on the first sight.
 
 ```{r}
@@ -86,7 +85,7 @@ colnames(genes)[11:30] <- c("P1_healthy_beta","P2_healthy_beta","P3_healthy_beta
 
 ###Quality control
 
-It is important to remove values that are not needed for or even hinder further analysis. Among other values those are also coverage values, which seem to be unrealistically high due to PCR dublicates or repetetive regions. Also they can be or that low, so the belonging beta-value of the DNA section has no meaning, because there was no fitting allignment when mapping back PCR fragments onto the genome. 
+It is important to remove values that are not needed for or even hinder further analysis. Among other values those are also coverage values, which seem to be unrealistically high due to PCR dublicates or repetetive regions. Also they can be that low, so the belonging beta-value of the DNA section has no meaning, because there was no fitting allignment when mapping back PCR fragments onto the genome. 
 A **data frame only containing coverage values** is created.
 
 ```{r}
@@ -96,7 +95,6 @@ cov_genes <- genes[,c(1,21:30)]
 At this point we already delete some genes, which are the genes on the X- and Y-chromosome. Somehow there must have been problems in obtaining the beta and coverage values for those chromosomes, because the beta-values are either not a number (NaN) or mainly 1.000, which could be caused by technical source of error. The belonging coverage is in most cases 0, so we can not use those beta-values values anyway. 
 More likely, the X-chromosome has to be removed due to the fact of its inactivation in women. Since only one X chromosome is allowed to be active in women, as otherwise it could lead to complications, one must be inactivated (since women have two X chromosomes). This is done by methylation of an X chromosome and binding of an inactivating RNA. Since this methylation can not be related to possible cancer, but has a natural cause, one must remove these chromosomes out of the data.
 If the cause of the cancer were on the Y-chromosome, only men would be affected. Since this is not the case, this chromosome must also be removed from the record.
-Following code **removes the X- and Y-chromosome**.
 
 Source: (Sharp et al., 2011)
 
@@ -105,6 +103,8 @@ Sharp, A.J., Stathaki, E., Migliavacca, E., Brahmachary, M., Montgomery, S.B., D
 
 
 ####Removing genes on X- and Y-chsomosome
+
+Following code **removes the X- and Y-chromosome**.
 
 ```{r}
 cov_genes_new <- cov_genes[-which(cov_genes =="chrX"),]
@@ -116,13 +116,13 @@ cov_genes <- cov_genes[ ,c(2:11)]
 
 ####Finding a coverage value threshold
 
-But back to the very high or low coverage values: There need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value distribution among all patients using a logarithmic density plot of the coverage means of all patients for each genome segment. Therefor a **matrix containing the means** in generated.
+Concerning the very high or low coverage values: there need to be a threshold defining a senseful coverage value range. To determine a threshold we have a look at the coverage value distribution among all patients using a logarithmic density plot of the coverage means of all patients for each genome segment. Therefore a **matrix containing the means** in generated.
 ```{r}
 cov_genes_means <- rowMeans(data.matrix(cov_genes))
 ```
 
 A **logarithmic density plot** using this matrix values is generated.
-To **find an upper threshold** for deleting coverage values we try quantile values used in literature and draw the lines for those quantiles in the logarithmic plot to see whether one of those coincidences with a kink in the curve. For the **lower threshold** we draw lines at the values 10 and 15, which are common threshold values as we read in literature.
+To **find an upper threshold** for deleting coverage values we try quantile values used in literature and draw the lines for those quantiles in the logarithmic plot to see whether one of those coincidences with a kink in the curve. For the **lower threshold** we draw lines at the values 10 and 15.
 
 ```{r}
 plot(density(log10(cov_genes_means)), xlab = "Coverage means", main = "Coverage distribution")
@@ -384,7 +384,7 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 
 ####Checking our PC 1 to 5 for significant batch effect per category 
 
-To verify the observations, as visualisation is not an objective way to interprete data, it is important to test if batch effect of different categories is significant for the first five principal components, as they explain most of the data´s variance.
+To verify the observations, as visualisation is not an objective way to interprete data, it is important to test if batch effect of different categories is significant for the first five principal components, as they explain most of the data's variance.
 Therefore, it is necessary to create three dataframes containing PC 1-5 and the categories of the annotation table which want to be investigated. Three dataframes are needed because different tests are performed for different data types. 
 
 For numbers the **permutation test** (of Pearson's r correlation coefficient) is used, for two categories the **Wilcoxon test** and for more than two different categories the **Kruskal-Wallis test**.
@@ -405,7 +405,7 @@ The **permutation test** is a non-parametric test to check, whether two not conn
 
 The **permutation test** is used for "SEQ_RUNS_COUNT", because numbers have to be examined.
 
-CODE ERKLÄREN
+
 
 ```{r}
 cor.perm <- function (x, y, nperm = 1000)
@@ -445,7 +445,6 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 
 Categories "BIOMATERIAL_PROVIDER", "DISEASE" and "Predicted.Gender" were tested for a possible batch effect by using the **Wilcoxon test**, as there are exactly two different results.
 
-CODE ERKLÄREN
 
 ```{r}
 p_values_wilcoxon <- c()
@@ -462,7 +461,7 @@ for (j in 1:5){
 
 Category "sample_desc_3" is invesigated by **Kruskal-wallis test** as it has three different non-numeric resultst.
 
-CODE ERKLÄREN
+
 
 ```{r}
 batch_kruskal <- within(batch_kruskal, {
