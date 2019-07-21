@@ -2,9 +2,8 @@
 title: "Cancer methylome analysis CLL vs. B-Cells"
 author: "Leona Brandl, Carlotta Brueggen, Tim Kuehn, Violetta Schaaf"
 date: "21st July 2019"
-output: 
+output:
   word_document: default
-  pdf_document: default
   html_document: default
 ---
 
@@ -304,7 +303,7 @@ pca_M <- prcomp(t(M_genes))
 
 ####How much variation does each component account for?
 
-In order to have a better overview on the obtained principal components, we study how much variation in percentage each principal component accounts for. We plot the percentage for each component and decide with the "elbow method" with how many PC we have to work with. 
+In order to have a better overview on the obtained principal components, we study how much variation in percentage each principal component accounts for. We plot the percentage for each component and decide with the **elbow method** with how many PC we have to work with. 
  
 ```{r}
 var_pca <- pca_M$sdev^2
@@ -337,9 +336,7 @@ ggplot(data=pca_values, aes(x=X, y=Y, label=Sample)) +
 
 ###Investigation for batch effect
 
-Using different categories of the annotation tbale makes it possible to check for a possible **batch effect**. Batch effect is a **technical source of error**. It is important that the technical variation does not confound with the biology to not falsify the interpreted data. Therfore it is important to check for a batch effect to see whether the variance explained by the principal components is related to technical error or by biological influence.
-
-We check for a batch effect to see whether the variance our PC explains Is related to technical error or biological influence 
+Using different categories of the annotation table makes it possible to check for a potential **batch effect**. Batch effect is a **technical source of error**. It is important that the technical variation does not confound with the biology to not falsify the interpreted data. Therfore it is important to check for a batch effect to see whether the variance explained by the principal components is related to technical source of error or by biological influence.
 
 First, principal components one and two were examined for the batch effect by distinguishing different categories by different colors and shapes. The categories to be examined were "gender", "sample desc", "biomaterial provider" and "age". However, the age is to be viewed critically, since depending on the age, different levels of methylation may be present and could mistakenly be taken as a batch effect, although it is a biological origin.
 
@@ -382,6 +379,9 @@ grid.arrange(ggplot_3,ggplot_4, ncol=2)
 ```
 
 
+By having a look at the plotted principal components with regard of the different categories, it seems like **gender** and **age** have no influence on PC one or two, since both graphics show a mixed composition. Looking at **cell type** and **biomaterial provider**, principal component two still does not show abnormalities, whereas principal component one does not separate very well anymore and this might indicate a batch effect.
+
+
 ####Checking our PC 1 to 5 for significant batch effect per category 
 
 To verify the observations, as visualisation is not an objective way to interprete data, it is important to test if batch effect of different categories is significant for the first five principal components, as they explain most of the data's variance.
@@ -404,7 +404,6 @@ batch_permutation <- data.frame (pca1_5, annotation$SEQ_RUNS_COUNT)
 The **permutation test** is a non-parametric test to check, whether two not connected spot checks derive from the same basic total unit. The H0 hypothesis assumes that both spot checks derive from the same basic total unit. The permutation test in the usual form is tailored to the counter hypothesis that the distributions of the two samples emerge by a shift apart. Often the question is not only if there is a shift, but also how big is this shift. Basically it is possible to check for a batch effect with numbers.
 
 The **permutation test** is used for "SEQ_RUNS_COUNT", because numbers have to be examined.
-
 
 
 ```{r}
@@ -445,6 +444,7 @@ p_SEQ_RUNS_COUNT <- data.frame(p_PC1_SEQ$P.per, p_PC2_SEQ$P.per, p_PC3_SEQ$P.per
 
 Categories "BIOMATERIAL_PROVIDER", "DISEASE" and "Predicted.Gender" were tested for a possible batch effect by using the **Wilcoxon test**, as there are exactly two different results.
 
+By applying a for loop to the created dataset, in this case the first five principal components of patients one to ten together with the categories of investigation, it is possible to create a dataframe, which holds the 15 p values for the three categories.
 
 ```{r}
 p_values_wilcoxon <- c()
@@ -457,11 +457,10 @@ for (j in 1:5){
 }
 ```
 
+
 ####Kruskal-Wallis for several categories
 
 Category "sample_desc_3" is invesigated by **Kruskal-wallis test** as it has three different non-numeric resultst.
-
-
 
 ```{r}
 batch_kruskal <- within(batch_kruskal, {
@@ -507,7 +506,7 @@ total_pvalue <- cbind(p_DISEASE_t,p_BIOMATERIAL_PROVIDER_t,p_Predicted.Gender_t,
 ```
 
 
-We give to the columns and rows informative names.
+Giving columns and rows informative names.
 
 ```{r}
 names(total_pvalue)[1] <- "p_DISEASE"
@@ -527,8 +526,9 @@ rownames(total_pvalue)[rownames(total_pvalue) == "p_PC5_SEQ.P.per"] <- "PC5"
 
 ####Preparation for heatmap 
 
-To **decide which PC we will use for further analysis**, we draw a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
-For analyzing and comparing all p-values we choose as threshold for significancy 0.1 because this is a common threshold applied in statistical tests. To make visualization easier we set values above the significance threshold to 10 and values equal or below to 1, so we just have to find colours for 2 values.
+To **decide which PC is useful for further analysis**, it is helpful to create a heatmap showing which principle component is affected significantly by a batch effect. All significant p-values are shown in red and non-significant ones in blue.
+To analyse and compare the p values, the limit of significance is set to be 0.1, as this is a common value for statistical tests. 
+To make visualization easier, values above the significance threshold are set to 10 and values equal or below the threshold to 1, because it is easiert to deal with two colours.
 
 ```{r}
 
@@ -548,6 +548,8 @@ for (i in 1:ncol(total_pvalue)){
 
 
 ####Heatmap 
+
+A **heatmap** with the the new values out of the for loop is created.
 
 ```{r message=FALSE, warning=FALSE}
 library(gplots)
@@ -575,19 +577,19 @@ par(cex.main = 1)
 ```
 
 
-By looking at the heatmap or at the p-values one can see that principal component 1 has batch effect for the categories "sample desc" and "biomaterial provider".
+By looking at the heatmap or at the p-values respectively, one can see that **principal component 1** has **batch effect** for the categories **sample desc** and **biomaterial provider** (and for **disease**).
 	
-	To sum it up: Principal component one in general explains more variance than principal component two (Chapter 2: Normalisation). However, the heatmap shows that part of the variance must come from the batch effect and not from dividing the two patient groups in sick and healthy.
-	Looking at the heatmap shows that principal component one shows batch effect for three categories, or two categories of investigation and a category of controll respectively.
-	The two important categories are "sample desc" and "biomaterial provider", and the controll category is "disease". A signigicant difference in the first two categories is not good for the principal component, as it is not clear how much of the variance really is explainable by batch effect or a biological difference. On the other hand, the significance for "disease", as indicated in the heatmap, is a good sign, as this is a controll category and should show significance, since it separates the data according to the criterion which is searched for.
-	Principal component two explains most variance except of component one. By having a look at the heatmap, it shows no significance at all, which is a good sign for the investigated categories, but not for the category of controll respecitvely.
-	Since it is not known how much of the explained variance was caused by the batch effect and not due to biological abuse, **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
+To sum it up: Principal component one in general explains more variance than principal component two (Chapter 2: Normalisation). However, the heatmap shows that part of the variance must come from the batch effect and not from dividing the two patient groups in sick and healthy.
+Looking at the heatmap highlights that principal component one shows batch effect for three categories, or two categories of investigation and a category of controll respectively.
+The two important categories are **sample desc** and **biomaterial provider**, and the controll category is **disease**. A signigicant difference in the first two categories is not good for the principal component, as it is not clear how much of the variance really is explainable by batch effect or a biological difference. On the other hand, the significance for "disease", as indicated in the heatmap, is a good sign, as this is a controll category and should show significance, since it separates the data according to the criterion which is searched for.
+Principal component two explains most variance except of component one. By having a look at the heatmap, it shows no significance at all, which is a good sign for the investigated categories, but not for the category of controll respecitvely.
+Since it is not known how much of the explained variance was caused by the batch effect and not due to biological abuse, **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
 
 ###Feature selection
 
 ####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
 
-Now we want to compute feature selection, which means that we want **find the most important genes** for our analysis. We decide to select the genes that have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
+Now we want to compute feature selection, which means that we want to **find the most important genes** for our analysis. We decide to select the genes that have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
 
 ```{r}
 loading_scores <- pca_M$rotation[,2]
