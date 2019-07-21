@@ -282,6 +282,7 @@ For applying the PCA on our data we have to build a **dataset which contains sic
 
 ```{r}
 M_genes <- cbind(M_genes_healthy, M_genes_cancer)
+cat <- M_genes[1:10, 1:10]
 colnames(M_genes) <- c("1H","2H","3H","4H","5H","6CLL","7CLL","8CLL","9CLL","10CLL")
 ```
 
@@ -619,7 +620,59 @@ k_means_data2 <- M_genes[genes_top_2000,]
 k_means_data <- M_genes[genes_top_10000,]
 
 k <- kmeans(x = t(k_means_data2), centers = 2)
+k <-
+  kmeans(
+    x = t(k_means_data2),
+    centers = 2,
+    iter.max = 1000
+  )
 
+cluster <- data.frame(k[["cluster"]])
+cluster
+```
+
+One can see that the sick and healthy patients belong to two different clusters so it is possible to use principal component two for further testing.
+
+To sum it up: Principal component one in general explains more variance than principal component two (Chapter 2: Normalisation). However, the heatmap shows that part of the variance must come from the batch effect and not from dividing the two patient groups in sick and healthy.
+Looking at the heatmap highlights that principal component one shows batch effect for three categories, or two categories of investigation and a category of controll respectively.
+The two important categories are **sample desc** and **biomaterial provider**, and the controll category is **disease**. A signigicant difference in the first two categories is not good for the principal component, as it is not clear how much of the variance really is explainable by batch effect or a biological difference. On the other hand, the significance for "disease", as indicated in the heatmap, is a good sign, as this is a controll category and should show significance, since it separates the data according to the criterion which is searched for.
+Principal component two explains most variance except of component one. By having a look at the heatmap, it shows no significance at all, which is a good sign for the investigated categories, but not for the category of controll respecitvely.
+Since it is not known how much of the explained variance was caused by the batch effect and not due to biological abuse, **we go on with our analysis using principal component 2** which doesn't show a batch effect at all.
+
+###Feature selection
+
+####create a dataframe with loading scores of the 10000 most importat genes, which have the most influence for principal component 2.
+
+Now we want to compute feature selection, which means that we want to **find the most important genes** for our analysis. We decide to select the genes that have the most influence on the principal component two. For that we use the loading scores which we can find in rotation of the PCA. The loadings describe the weight of each gene in the principal component. If a gene has a high loading it has a high weight in the principal component. A loading can be positive or negative but we will first have a look on the absolut values. We create a dataframe containing the 2000 and 10000 most important genes in principal component 2 in ranked order.
+
+```{r}
+loading_scores <- pca_M$rotation[,2]
+gene_scores <- abs(loading_scores) 
+ranked_gene_score <- sort(gene_scores, decreasing=TRUE)
+genes_top_10000 <- names(ranked_gene_score[1:10000])
+genes_top_2000 <- names(ranked_gene_score[1:2000])
+```
+
+####Look for elbow in top gene variance
+
+Now we want to **decide how many genes we want to keep for further analysis** by looking for an elbow in the plot of loading scores. 
+
+```{r}
+plot(abs(pca_M$rotation[genes_top_10000,2]),type = "o", pch=20)
+```
+
+Actually there is a kink in the elbow plot of loading scores of the genes at round about 2000 genes. K-means clustering already worked with 2000 genes but by using only 2000 genes we get only 3 significant different methylated genes, which is not as many as expected. By using 10000 genes we get 24 differentially methylated genes, which is an amount easier to work with. 
+
+
+##4) Clustering with k-means
+
+K-means is a method to find groups in the data. It uses an iterative algorithm which means that there is a repetition of steps with the aim of finding the right cluster for each datapoint. In the first step the datapoints are split into k clusters (k chosen by the user). Each datapoint is assigned to one of the k clusters. In this dataframe, two centers are selected, as the outcome of sick and healthy is expected. If it was not clear how many centers make sense, an elbow plot could give you an idea.
+Next step is an updating of the clusters by calculating center of each cluster and define them as new clusterpoints. These two steps will be repeated as long as no datapoint change the belonging cluster. By performing k-means clustering it is possible to **check whether sick and healthy patients are separated in two different clusters**. For this two data sets with the M values of the 2000 and 10000 most important genes from PC2 have to be generated.
+
+```{r}
+k_means_data2 <- M_genes[genes_top_2000,]
+k_means_data <- M_genes[genes_top_10000,]
+k <- kmeans(x = t(k_means_data2), centers = 2)
 cluster <- data.frame(k[["cluster"]])
 cluster
 ```
