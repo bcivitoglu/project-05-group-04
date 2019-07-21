@@ -2,9 +2,8 @@
 title: "Cancer methylome analysis CLL vs. B-Cells"
 author: "Leona Brandl, Carlotta Brueggen, Tim Kuehn, Violetta Schaaf"
 date: "21st July 2019"
-output:
-  word_document: default
-  html_document: default
+output: html_document
+
 ---
 
 
@@ -619,13 +618,7 @@ Next step is an updating of the clusters by calculating center of each cluster a
 k_means_data2 <- M_genes[genes_top_2000,]
 k_means_data <- M_genes[genes_top_10000,]
 
-k <- kmeans(x = t(k_means_data2), centers = 2, iter.max = 1000)
-k <-
-  kmeans(
-    x = t(k_means_data),
-    centers = 2,
-    iter.max = 1000
-  )
+k <- kmeans(x = t(k_means_data2), centers = 2)
 
 cluster <- data.frame(k[["cluster"]])
 cluster
